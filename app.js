@@ -1,3 +1,8 @@
+// Backend API (update this URL after deploying to Render)
+const BACKEND_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3001'
+    : 'https://housecup-backend.onrender.com'; // ← replace with your Render URL
+
 // Data Reference
 const schools = [
     "Gateway College Dehiwala",
@@ -19,9 +24,11 @@ const candidates = [
     { character: "King Lear", actor: "Nadun Perera" }
 ];
 
+let selectedTicket = null;
 let selectedSeat = null;
 let selectedSchool = null;
 let selectedCandidate = null;
+let isSubmitting = false; // prevent duplicate submissions
 
 // Theatre Seat Configuration
 const layout = [
@@ -52,22 +59,72 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCandidates();
     setupScrollAnimations();
     initCountdown();
-    
-    // Hide cinematic intro safely after delay
-    setTimeout(() => {
-        const overlay = document.getElementById('introOverlay');
-        if (overlay) overlay.classList.add('hidden');
-    }, 2800);
 
-    // Sync input to grid dynamically
+    // Debounced seat input — avoids DOM thrash on every keypress
     const seatInput = document.getElementById('seatInput');
-    if(seatInput) {
+    if (seatInput) {
+        let seatDebounce;
         seatInput.addEventListener('input', function() {
             this.value = this.value.toUpperCase();
-            syncInputToMap(this.value);
+            clearTimeout(seatDebounce);
+            seatDebounce = setTimeout(() => syncInputToMap(this.value), 80);
         });
     }
+    
+    // Auto uppercase ticket input
+    const ticketInput = document.getElementById('ticketInput');
+    if (ticketInput) {
+        ticketInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+            document.getElementById('ticketError').classList.add('hidden');
+        });
+    }
+
+    // Progress bar — highlight step when section scrolls into view
+    const stepMap = {
+        'ticket-selection': 1, 'seat-selection': 2,
+        'school-selection': 3, 'voting': 4, 'confirmation': 5
+    };
+    const stepObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const step = stepMap[entry.target.id];
+                if (step) setProgressStep(step);
+            }
+        });
+    }, { threshold: 0.4 });
+    Object.keys(stepMap).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) stepObserver.observe(el);
+    });
 });
+
+function setProgressStep(step) {
+    document.querySelectorAll('.pb-step').forEach(el => {
+        const s = parseInt(el.dataset.step);
+        el.classList.toggle('active', s === step);
+        el.classList.toggle('done', s < step);
+    });
+}
+
+// Ticket Validation
+function validateTicket() {
+    const inputEl = document.getElementById('ticketInput');
+    const errorMsg = document.getElementById('ticketError');
+    const val = (inputEl.value || '').trim().toUpperCase();
+
+    if (!val || !/^[A-Z0-9]+$/.test(val)) {
+        errorMsg.textContent = 'Invalid ticket format. Alphanumeric only.';
+        errorMsg.classList.remove('hidden');
+        selectedTicket = null;
+        return;
+    }
+
+    errorMsg.classList.add('hidden');
+    selectedTicket = val;
+    inputEl.value = val;
+    scrollToSection('seat-selection');
+}
 
 // Seat Validation & Map Sync
 function syncInputToMap(inputValue) {
@@ -111,20 +168,22 @@ function handleVisualSeatClick(row, num, element) {
     syncInputToMap(seatId);
 }
 
-// Visual Map Rendering
+// Visual Map Rendering — uses DocumentFragment for a single DOM write
 function initSeatGrid() {
     const grid = document.getElementById('seatGrid');
     if (!grid) return;
-    grid.innerHTML = '';
+
+    const fragment = document.createDocumentFragment();
+    const takenSet = new Set(takenSeats); // O(1) lookup
 
     layout.forEach((rowData) => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'seat-row';
 
-        const rowLabelDiv = document.createElement('div');
-        rowLabelDiv.className = 'row-label';
-        rowLabelDiv.textContent = rowData.row;
-        rowDiv.appendChild(rowLabelDiv);
+        const rowLabel = document.createElement('div');
+        rowLabel.className = 'row-label';
+        rowLabel.textContent = rowData.row;
+        rowDiv.appendChild(rowLabel);
 
         let currentSeatNum = 1;
 
@@ -135,38 +194,38 @@ function initSeatGrid() {
             for (let i = 0; i < blockSize; i++) {
                 const seatDiv = document.createElement('div');
                 seatDiv.className = 'seat';
-                
                 const seatId = `${rowData.row}${currentSeatNum}`;
                 seatDiv.id = `seat-${seatId}`;
-                
-                if (takenSeats.includes(seatId)) {
+
+                if (takenSet.has(seatId)) {
                     seatDiv.classList.add('taken');
                 } else {
                     seatDiv.classList.add('available');
-                    // Binding click function properly by capturing current num value
                     const pinnedNum = currentSeatNum;
                     seatDiv.onclick = () => handleVisualSeatClick(rowData.row, pinnedNum, seatDiv);
                 }
-                
+
                 seatDiv.innerHTML = `<span>${currentSeatNum}</span>`;
                 blockDiv.appendChild(seatDiv);
                 currentSeatNum++;
             }
 
-            if (blockSize > 0 && index < 2 && rowData.blocks[index+1] > 0) {
+            if (blockSize > 0 && index < 2 && rowData.blocks[index + 1] > 0) {
                 blockDiv.style.marginRight = '2rem';
             }
-
             rowDiv.appendChild(blockDiv);
         });
 
-        const rowLabelRightDiv = document.createElement('div');
-        rowLabelRightDiv.className = 'row-label';
-        rowLabelRightDiv.textContent = rowData.row;
-        rowDiv.appendChild(rowLabelRightDiv);
+        const rowLabelRight = document.createElement('div');
+        rowLabelRight.className = 'row-label';
+        rowLabelRight.textContent = rowData.row;
+        rowDiv.appendChild(rowLabelRight);
 
-        grid.appendChild(rowDiv);
+        fragment.appendChild(rowDiv);
     });
+
+    grid.innerHTML = '';
+    grid.appendChild(fragment); // Single DOM write
 }
 
 function renderSchools() {
@@ -236,51 +295,111 @@ function scrollToSection(id) {
 
 function populateReviewState() {
     scrollToSection('confirmation');
+    document.getElementById('reviewTicket').textContent = selectedTicket;
     document.getElementById('reviewSeat').textContent = selectedSeat;
     document.getElementById('reviewSchool').textContent = selectedSchool;
     document.getElementById('reviewCandidate').textContent = selectedCandidate;
 }
 
-// Scroll Intersection Observer
+// Scroll Intersection Observer for reveal animations
 function setupScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if(entry.isIntersecting) {
+            if (entry.isIntersecting) {
                 entry.target.classList.add('active');
+                observer.unobserve(entry.target); // stop watching once revealed
             }
         });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
 
-    document.querySelectorAll('.reveal').forEach(section => {
-        observer.observe(section);
-    });
+    document.querySelectorAll('.reveal').forEach(section => observer.observe(section));
 }
 
-// Live Countdown Demo Timer
+// Live Countdown Timer — using requestAnimationFrame for efficiency
 function initCountdown() {
     const countdownEl = document.getElementById('countdown');
     if (!countdownEl) return;
-    const target = new Date().getTime() + (2 * 60 * 60 * 1000);
-    
-    setInterval(() => {
-        const now = new Date().getTime();
-        const distance = target - now;
-        
+    const target = Date.now() + (2 * 60 * 60 * 1000);
+    let lastDisplay = '';
+
+    function tick() {
+        const distance = target - Date.now();
         if (distance < 0) {
-            countdownEl.innerHTML = "CLOSED";
+            countdownEl.textContent = 'CLOSED';
             return;
         }
-        
-        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((distance % (1000 * 60)) / 1000);
-        
-        countdownEl.innerHTML = 
-            `${h.toString().padStart(2, '0')} : ${m.toString().padStart(2, '0')} : ${s.toString().padStart(2, '0')}`;
-    }, 1000);
+        const h = Math.floor(distance / 3600000);
+        const m = Math.floor((distance % 3600000) / 60000);
+        const s = Math.floor((distance % 60000) / 1000);
+        const display = `${String(h).padStart(2,'0')} : ${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
+        if (display !== lastDisplay) {
+            countdownEl.textContent = display;
+            lastDisplay = display;
+        }
+        setTimeout(tick, 1000);
+    }
+    tick();
 }
 
-// Final Action
-function submitVote() {
-    document.getElementById('successModal').classList.remove('hidden');
+// Final Action — POST vote to backend (single request, duplicate-submit-safe)
+async function submitVote() {
+    if (isSubmitting) return; // hard guard against double-tap
+
+    const submitBtn = document.getElementById('submitVoteBtn');
+    const btnText   = document.getElementById('submitBtnText');
+    const spinner   = document.getElementById('submitSpinner');
+    const errorEl   = document.getElementById('voteSubmitError');
+
+    if (!selectedTicket || !selectedSeat || !selectedSchool || !selectedCandidate) {
+        if (errorEl) { errorEl.textContent = 'Please complete all steps first.'; errorEl.classList.remove('hidden'); }
+        return;
+    }
+
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    btnText.textContent = 'Submitting…';
+    spinner.classList.remove('hidden');
+    if (errorEl) errorEl.classList.add('hidden');
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/vote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ticket: selectedTicket,
+                seat: selectedSeat,
+                school: selectedSchool,
+                candidate: selectedCandidate
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // Keep button disabled forever — vote was cast
+            document.getElementById('successModal').classList.remove('hidden');
+        } else {
+            // Recoverable error — re-enable button
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            btnText.textContent = 'Submit Final Vote';
+            spinner.classList.add('hidden');
+            if (errorEl) {
+                const msg = res.status === 409
+                    ? `⚠ ${data.error || 'Already voted from this seat/ticket.'}`
+                    : data.error || 'Something went wrong. Please try again.';
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+            }
+        }
+    } catch (err) {
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        btnText.textContent = 'Submit Final Vote';
+        spinner.classList.add('hidden');
+        if (errorEl) {
+            errorEl.textContent = 'Could not reach the server. Check your connection.';
+            errorEl.classList.remove('hidden');
+        }
+    }
 }

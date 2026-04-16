@@ -506,25 +506,27 @@ button.disabled {
     box-shadow: none;
 }
 
-/* Delay hero intro content */
+/* Hero intro content fades in quickly on load */
 .hero-content h1, .hero-content .subtitle, .hero-content .tagline, .hero-content button, .countdown-container {
-    animation: fadeIn 1s ease backwards;
+    animation: fadeIn 0.5s ease both;
 }
-.hero-content h1 { animation-delay: 3.0s; }
-.hero-content .subtitle { animation-delay: 3.2s; }
-.hero-content .tagline { animation-delay: 3.4s; }
-.hero-content button { animation-delay: 3.6s; }
-.countdown-container { animation-delay: 3.8s; }
+.hero-content h1 { animation-delay: 0.1s; }
+.hero-content .subtitle { animation-delay: 0.2s; }
+.hero-content .tagline { animation-delay: 0.3s; }
+.hero-content button { animation-delay: 0.4s; }
+.countdown-container { animation-delay: 0.5s; }
 
-/* Scroll Reveal */
+/* Scroll Reveal — faster, GPU-composited */
 .reveal {
     opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    will-change: opacity, transform;
 }
 .reveal.active {
     opacity: 1;
     transform: translateY(0);
+    will-change: auto;
 }
 
 /* Modal */
@@ -563,41 +565,59 @@ button.disabled {
     box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
 }
 
-/* Intro Overlay */
-.intro-overlay {
+/* Progress Bar */
+.progress-bar {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--bg-dark);
-    z-index: 9999;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(10,10,12,0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--card-border);
+}
+.pb-step {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 1s ease-in-out, visibility 1s;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.pb-step.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #000;
+}
+.pb-step.done {
+    background: rgba(212,175,55,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
 }
 
-.intro-overlay.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+/* Spinner */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.5rem;
 }
-
-.intro-logo {
-    width: 80%;
-    max-width: 300px;
-    height: auto;
-    max-height: 40vh;
-    object-fit: contain;
-    opacity: 0;
-    transform: scale(0.9);
-    animation: cinematicReveal 3s forwards;
-}
-
-@keyframes cinematicReveal {
-    0% { opacity: 0; transform: scale(0.85); filter: blur(10px); }
-    20% { opacity: 1; transform: scale(1); filter: blur(0); }
-    80% { opacity: 1; transform: scale(1.05); filter: blur(0); }
-    100% { opacity: 0; transform: scale(1.1); filter: blur(5px); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 @keyframes fadeInDown {
     from { opacity: 0; transform: translateY(-20px); }
