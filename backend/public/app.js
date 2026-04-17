@@ -92,27 +92,37 @@ async function fetchData() {
 }
 
 function initIntroAnimation() {
+    console.log('[Intro] Initializing cinematic entrance...');
     const overlay = document.getElementById('intro-overlay');
     const content = document.getElementById('main-content');
-
+    
     // Check if intro has played this session
     if (sessionStorage.getItem('hp_intro_played')) {
+        console.log('[Intro] Already played this session, skipping.');
         if (overlay) overlay.style.display = 'none';
-        if (content) content.classList.remove('content-hidden', 'content-visible');
+        if (content) {
+            content.classList.remove('content-hidden');
+            content.style.opacity = '1';
+            content.style.transform = 'none';
+        }
         return;
     }
 
     // Play animation
     setTimeout(() => {
+        console.log('[Intro] Animation complete, revealing site.');
         if (overlay) overlay.classList.add('fade-out');
-        if (content) content.classList.add('content-visible');
+        if (content) {
+            content.classList.remove('content-hidden');
+            content.classList.add('content-visible');
+        }
         sessionStorage.setItem('hp_intro_played', 'true');
-
+        
         // Remove from DOM after fade to keep clean
         setTimeout(() => {
             if (overlay) overlay.remove();
         }, 1000);
-    }, 2200); // Wait for the cinematic zoom + shimmer (1.8s + buffer)
+    }, 2200); 
 }
 
 // Ticket Validation
