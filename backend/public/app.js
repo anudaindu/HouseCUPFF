@@ -33,7 +33,6 @@ const layout = [
 const takenSeats = ['A5', 'A6', 'D12', 'D13', 'F8', 'G2', 'K19', 'O14', 'O15', 'P1', 'P25', 'Q10'];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    initIntroAnimation(); // MUST be first to handle visibility
     await fetchData();
     initSeatGrid();
     renderSchools();
@@ -89,40 +88,6 @@ async function fetchData() {
     } catch (err) {
         console.error('Failed to fetch data:', err);
     }
-}
-
-function initIntroAnimation() {
-    console.log('[Intro] Initializing cinematic entrance...');
-    const overlay = document.getElementById('intro-overlay');
-    const content = document.getElementById('main-content');
-    
-    // Check if intro has played this session
-    if (sessionStorage.getItem('hp_intro_played')) {
-        console.log('[Intro] Already played this session, skipping.');
-        if (overlay) overlay.style.display = 'none';
-        if (content) {
-            content.classList.remove('content-hidden');
-            content.style.opacity = '1';
-            content.style.transform = 'none';
-        }
-        return;
-    }
-
-    // Play animation
-    setTimeout(() => {
-        console.log('[Intro] Animation complete, revealing site.');
-        if (overlay) overlay.classList.add('fade-out');
-        if (content) {
-            content.classList.remove('content-hidden');
-            content.classList.add('content-visible');
-        }
-        sessionStorage.setItem('hp_intro_played', 'true');
-        
-        // Remove from DOM after fade to keep clean
-        setTimeout(() => {
-            if (overlay) overlay.remove();
-        }, 1000);
-    }, 2200); 
 }
 
 // Ticket Validation
