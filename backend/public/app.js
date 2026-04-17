@@ -1,7 +1,4 @@
-// Backend API (update this URL after deploying to Render)
-const BACKEND_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:3001'
-    : 'https://housecup-backend.onrender.com'; // ← replace with your Render URL
+const BACKEND_URL = window.location.origin;
 
 // Data Reference
 const schools = [
