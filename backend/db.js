@@ -13,6 +13,20 @@ async function initDB() {
     const client = await pool.connect();
     try {
         await client.query(`
+            CREATE TABLE IF NOT EXISTS schools (
+                id          SERIAL PRIMARY KEY,
+                name        VARCHAR(100) NOT NULL UNIQUE,
+                logo_url    TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS candidates (
+                id              SERIAL PRIMARY KEY,
+                character_name  VARCHAR(150) NOT NULL,
+                actor_name      VARCHAR(150) NOT NULL,
+                school_id       INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+                image_url       TEXT
+            );
+
             CREATE TABLE IF NOT EXISTS votes (
                 id          SERIAL PRIMARY KEY,
                 ticket      VARCHAR(50)  NOT NULL UNIQUE,
@@ -22,10 +36,6 @@ async function initDB() {
                 voted_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
             );
         `);
-        // Safely add ticket column if table existed before this update
-        try {
-            await client.query(`ALTER TABLE votes ADD COLUMN ticket VARCHAR(50) UNIQUE;`);
-        } catch (e) {}
         console.log('[DB] votes table ready.');
     } finally {
         client.release();

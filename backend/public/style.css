@@ -88,9 +88,10 @@ section {
     align-items: center;
     border-top: 1px solid var(--card-border);
     position: relative;
-    padding: 6rem 0;
+    padding: 6rem 1.5rem;
     flex-direction: column;
     justify-content: center;
+    text-align: center;
 }
 
 section::before {
@@ -155,7 +156,7 @@ section::before {
     object-fit: contain;
     margin: 0 auto 1.5rem auto;
     display: block;
-    animation: fadeInDown 1.5s ease 0.2s backwards;
+    /* Removed animation to appear "right away" as requested */
 }
 
 .countdown-container {
@@ -166,10 +167,11 @@ section::before {
 
 /* Inputs */
 .input-group {
-    margin-top: 1rem;
+    margin: 2rem auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 input[type="text"] {
@@ -293,11 +295,20 @@ input[type="text"]:focus {
     border: 2px solid var(--card-border);
     border-radius: 20px;
     padding: 1.2rem;
-    text-align: left;
+    text-align: center; /* Center school names */
     cursor: pointer;
     transition: all 0.2s;
     font-size: 1.1rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+.school-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .selectable-card:active { transform: scale(0.98); }
@@ -359,6 +370,12 @@ input[type="text"]:focus {
     flex-shrink: 0;
     box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
     transition: all 0.3s;
+    overflow: hidden;
+}
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .actor-card.selected .avatar-large {

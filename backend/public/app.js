@@ -1,25 +1,7 @@
 const BACKEND_URL = window.location.origin;
 
-// Data Reference
-const schools = [
-    "Gateway College Dehiwala",
-    "Musaeus College Colombo",
-    "Gateway College Colombo",
-    "Lyceum College Nugegoda"
-];
-
-const candidates = [
-    { character: "Romeo", actor: "Renal Perera" },
-    { character: "Juliet", actor: "Kimali Abeynayaka" },
-    { character: "Hamlet", actor: "Dinesh Hettiarachchi" },
-    { character: "Ophelia", actor: "Amaya Perera" },
-    { character: "Macbeth", actor: "Ravindu Abeynayaka" },
-    { character: "Lady Macbeth", actor: "Tharushi Hettiarachchi" },
-    { character: "Othello", actor: "Nimesh Perera" },
-    { character: "Desdemona", actor: "Dulmini Abeynayaka" },
-    { character: "Mercutio", actor: "Chamod Hettiarachchi" },
-    { character: "King Lear", actor: "Nadun Perera" }
-];
+let schools = [];
+let candidates = [];
 
 let selectedTicket = null;
 let selectedSeat = null;
@@ -50,7 +32,8 @@ const layout = [
 // Pre-taken for realism demo
 const takenSeats = ['A5', 'A6', 'D12', 'D13', 'F8', 'G2', 'K19', 'O14', 'O15', 'P1', 'P25', 'Q10'];
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchData();
     initSeatGrid();
     renderSchools();
     renderCandidates();
@@ -82,11 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'ticket-selection': 1, 'seat-selection': 2,
         'school-selection': 3, 'voting': 4, 'confirmation': 5
     };
+    // Step Observer (Scroll Reveal)
     const stepObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const step = stepMap[entry.target.id];
-                if (step) setProgressStep(step);
+                // Removed progress step updates as progress bar was removed
             }
         });
     }, { threshold: 0.4 });
@@ -96,12 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function setProgressStep(step) {
-    document.querySelectorAll('.pb-step').forEach(el => {
-        const s = parseInt(el.dataset.step);
-        el.classList.toggle('active', s === step);
-        el.classList.toggle('done', s < step);
-    });
+async function fetchData() {
+    try {
+        const res = await fetch('/api/public/data');
+        const data = await res.json();
+        schools = data.schools;
+        candidates = data.candidates;
+    } catch (err) {
+        console.error('Failed to fetch data:', err);
+    }
 }
 
 // Ticket Validation
@@ -233,12 +219,18 @@ function renderSchools() {
     schools.forEach(school => {
         const div = document.createElement('div');
         div.className = 'selectable-card';
-        div.textContent = school;
+        
+        let logoHtml = '';
+        if (school.logo_url) {
+            logoHtml = `<img src="${school.logo_url}" class="school-logo" alt="${school.name} Logo">`;
+        }
+        
+        div.innerHTML = `${logoHtml} <span>${school.name}</span>`;
         
         div.onclick = () => {
             document.querySelectorAll('#schoolGrid .selectable-card').forEach(el => el.classList.remove('selected'));
             div.classList.add('selected');
-            selectedSchool = school;
+            selectedSchool = school.name;
             document.getElementById('btnToVoting').classList.remove('disabled');
         };
         grid.appendChild(div);
@@ -251,17 +243,21 @@ function renderCandidates() {
     grid.innerHTML = '';
     
     candidates.forEach(cand => {
-        // Generate initials from Actor Name
-        const initials = cand.actor.split(' ').map(n => n[0]).join('');
+        const initials = cand.actor_name.split(' ').map(n => n[0]).join('');
         
         const div = document.createElement('div');
         div.className = 'actor-card selectable-card';
         
+        let avatarHtml = `<div class="avatar-large">${initials}</div>`;
+        if (cand.image_url) {
+            avatarHtml = `<div class="avatar-large"><img src="${cand.image_url}" class="avatar-img" alt="${cand.character_name}"></div>`;
+        }
+        
         div.innerHTML = `
-            <div class="avatar-large">${initials}</div>
+            ${avatarHtml}
             <div class="actor-info-text">
-                <h3 class="character-name">${cand.character}</h3>
-                <p class="actor-name">${cand.actor}</p>
+                <h3 class="character-name">${cand.character_name}</h3>
+                <p class="actor-name">${cand.actor_name}</p>
             </div>
             <div class="vote-btn-container">
                 <button class="vote-btn">Vote</button>
@@ -277,7 +273,7 @@ function renderCandidates() {
             // Select clicked
             div.classList.add('selected');
             div.querySelector('.vote-btn').textContent = 'Selected';
-            selectedCandidate = `${cand.character} (${cand.actor})`;
+            selectedCandidate = `${cand.character_name} (${cand.actor_name})`;
             
             document.getElementById('btnToConfirmation').classList.remove('disabled');
         };

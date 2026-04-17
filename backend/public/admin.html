@@ -349,14 +349,15 @@
         </div>
         <div class="form-group">
             <label>Actor Name</label>
-            <input type="text" id="candActor" placeholder="e.g. John Doe">
+            <input type="text" id="candActor" placeholder="e.g. Leonardo DiCaprio">
         </div>
         <div class="form-group">
-            <label>Assigned School</label>
-            <select id="candSchool">
-                <option value="">Select a school...</option>
-                <!-- Populated by JS -->
-            </select>
+            <label>School</label>
+            <select id="candSchool"></select>
+        </div>
+        <div class="form-group">
+            <label>Image URL (Optional)</label>
+            <input type="text" id="candImage" placeholder="https://example.com/photo.jpg">
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" onclick="closeModal('candidateModal')">Cancel</button>
@@ -371,7 +372,11 @@
         <input type="hidden" id="schoolId">
         <div class="form-group">
             <label>School Name</label>
-            <input type="text" id="schoolName" placeholder="e.g. Gateway College">
+            <input type="text" id="schoolName" placeholder="e.g. Hogwarts">
+        </div>
+        <div class="form-group">
+            <label>Logo URL (Optional)</label>
+            <input type="text" id="schoolLogo" placeholder="https://example.com/logo.png">
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" onclick="closeModal('schoolModal')">Cancel</button>
@@ -383,19 +388,8 @@
 <script>
     let adminPassword = '';
     let pieChartInstance = null;
-
-    // Dummy UI state since backend endpoints for candidates/schools aren't built yet
-    let uiCandidates = [
-        { id: 1, character: "Romeo", actor: "Renal Perera", school: "Gateway College Dehiwala" },
-        { id: 2, character: "Juliet", actor: "Kimali Abeynayaka", school: "Musaeus College Colombo" },
-        { id: 3, character: "Hamlet", actor: "Dinesh Hettiarachchi", school: "Gateway College Colombo" }
-    ];
-    let uiSchools = [
-        { id: 1, name: "Gateway College Dehiwala" },
-        { id: 2, name: "Musaeus College Colombo" },
-        { id: 3, name: "Gateway College Colombo" },
-        { id: 4, name: "Lyceum College Nugegoda" }
-    ];
+    let schoolsData = [];
+    let candidatesData = [];
 
     document.getElementById('pwInput').addEventListener('keydown', e => {
         if (e.key === 'Enter') attemptLogin();
@@ -406,17 +400,12 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         document.getElementById(`tab-${tabId}`).classList.add('active');
+        if(tabId === 'candidates' || tabId === 'schools') loadManagementData();
     }
 
     /* ── Modals ── */
     function openModal(id) { 
         document.getElementById(id).style.display = 'flex'; 
-        if(id === 'candidateModal' && !document.getElementById('candidateId').value) {
-            document.getElementById('candidateModalTitle').innerText = 'Add Candidate';
-        }
-        if(id === 'schoolModal' && !document.getElementById('schoolId').value) {
-            document.getElementById('schoolModalTitle').innerText = 'Add School';
-        }
     }
     
     function closeModal(id) { 
@@ -427,37 +416,32 @@
             document.getElementById('candCharacter').value = '';
             document.getElementById('candActor').value = '';
             document.getElementById('candSchool').value = '';
+            document.getElementById('candImage').value = '';
+            document.getElementById('candidateModalTitle').innerText = 'Add Candidate';
         }
         if(id === 'schoolModal') {
             document.getElementById('schoolId').value = '';
             document.getElementById('schoolName').value = '';
+            document.getElementById('schoolLogo').value = '';
+            document.getElementById('schoolModalTitle').innerText = 'Add School';
         }
-    }
-
-    // API Integration 
-    function getHeaders() {
-        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` };
     }
 
     async function attemptLogin() {
         const pw = document.getElementById('pwInput').value.trim();
         if (!pw) return;
         adminPassword = pw;
-        
-        // Initial load includes verifying password against results endpoint
         const success = await loadResults();
         if (success) {
             document.getElementById('loginGate').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('loginError').style.display = 'none';
-            loadManagementDataUI();
         }
     }
 
     async function loadResults() {
-        const apiBase = window.location.origin;
         try {
-            const res = await fetch(`${apiBase}/api/admin/results?password=${encodeURIComponent(adminPassword)}`);
+            const res = await fetch(`/api/admin/results?password=${encodeURIComponent(adminPassword)}`);
             if (res.status === 401) {
                 document.getElementById('loginError').style.display = 'block';
                 return false;
@@ -470,20 +454,16 @@
             return true;
         } catch (err) {
             console.error(err);
-            document.getElementById('loginError').textContent = 'Could not connect to server.';
-            document.getElementById('loginError').style.display = 'block';
             return false;
         }
     }
 
-    /* ── Render Results ── */
     function renderStats(data) {
         document.getElementById('statTotal').textContent = data.totalVotes;
         if (data.byCandidate.length > 0) {
             const top = data.byCandidate[0];
-            const charName = top.candidate.split('(')[0].trim();
-            document.getElementById('statLeader').textContent = charName;
-            document.getElementById('statLeaderVotes').textContent = `${top.votes} vote${top.votes == 1 ? '' : 's'}`;
+            document.getElementById('statLeader').textContent = top.candidate.split('(')[0].trim();
+            document.getElementById('statLeaderVotes').textContent = `${top.votes} votes`;
         } else {
             document.getElementById('statLeader').textContent = 'No votes yet';
         }
@@ -491,29 +471,20 @@
 
     function renderBarChart(byCandidate) {
         const el = document.getElementById('barList');
-        if (!byCandidate || byCandidate.length === 0) {
-            el.innerHTML = '<div class="empty-state">No votes recorded yet.</div>';
-            return;
-        }
+        if (!byCandidate.length) { el.innerHTML = '<div class="empty-state">No votes yet.</div>'; return; }
         const max = Math.max(...byCandidate.map(c => parseInt(c.votes)));
         el.innerHTML = byCandidate.map(c => {
-            const pct = max > 0 ? (parseInt(c.votes) / max * 100).toFixed(1) : 0;
-            const charName = c.candidate.split('(')[0].trim();
-            const actorName = (c.candidate.match(/\(([^)]+)\)/) || ['',''])[1];
-            return `
-                <div class="bar-item">
-                    <div class="bar-label" title="${c.candidate}">
-                        ${charName}<br><small style="color:var(--muted);font-size:.75rem">${actorName}</small>
-                    </div>
-                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-                    <div class="bar-count">${c.votes}</div>
-                </div>
-            `;
+            const pct = (parseInt(c.votes) / max * 100).toFixed(1);
+            return `<div class="bar-item">
+                <div class="bar-label">${c.candidate.split('(')[0].trim()}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <div class="bar-count">${c.votes}</div>
+            </div>`;
         }).join('');
     }
 
     function renderPieChart(bySchool) {
-        if (!bySchool || bySchool.length === 0) return;
+        if (!bySchool.length) return;
         const ctx = document.getElementById('distributionChart').getContext('2d');
         const counts = {};
         bySchool.forEach(r => { counts[r.school] = (counts[r.school] || 0) + parseInt(r.votes); });
@@ -521,55 +492,34 @@
         const labels = Object.keys(counts);
         const data = Object.values(counts);
 
-        if (pieChartInstance) {
-            pieChartInstance.data.labels = labels;
-            pieChartInstance.data.datasets[0].data = data;
-            pieChartInstance.update();
-            return;
-        }
+        if (pieChartInstance) pieChartInstance.destroy();
         pieChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: ['#f5c842', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f97316'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
+                datasets: [{ data: data, backgroundColor: ['#f5c842', '#ef4444', '#3b82f6', '#10b981'], borderWidth: 0 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e8e8f0', padding: 20 } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#e8e8f0' } } } }
         });
     }
 
     function renderAuditTable(allVotes) {
         const tbody = document.getElementById('auditBody');
-        if (!allVotes || allVotes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No votes yet.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = allVotes.map(v => {
-            const charName = v.candidate.split('(')[0].trim();
-            return `<tr>
-                <td style="color:var(--muted)">${v.ticket || '--'}</td>
-                <td><span style="color:var(--gold); font-weight:bold">${v.seat}</span></td>
-                <td>${v.school}</td>
-                <td>${charName}</td>
-            </tr>`;
-        }).join('');
+        if (!allVotes.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No votes.</td></tr>'; return; }
+        tbody.innerHTML = allVotes.map(v => `<tr>
+            <td style="color:var(--muted)">${v.ticket}</td>
+            <td><span style="color:var(--gold)">${v.seat}</span></td>
+            <td>${v.school}</td>
+            <td>${v.candidate.split('(')[0].trim()}</td>
+        </tr>`).join('');
     }
 
-    /* ── API Integrations for Candidates/Schools ── */
-    // Note: Since backend APIs don't exist yet, we use local arrays to mimic state UI updates.
-    
-    function loadManagementDataUI() {
+    /* ── Management Logic ── */
+    async function loadManagementData() {
+        const res = await fetch('/api/public/data');
+        const data = await res.json();
+        schoolsData = data.schools;
+        candidatesData = data.candidates;
         renderSchoolsTable();
         renderCandidatesTable();
         populateSchoolDropdown();
@@ -577,116 +527,101 @@
 
     function renderSchoolsTable() {
         const tbody = document.getElementById('schoolsBody');
-        if (!uiSchools.length) {
-            tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No schools added yet.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = uiSchools.map(s => `
-            <tr>
-                <td>${s.name}</td>
-                <td class="td-actions">
-                    <button class="btn-secondary" onclick="editSchoolUI(${s.id})">Edit</button>
-                    <button class="btn-danger" onclick="deleteSchoolUI(${s.id})">Delete</button>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = schoolsData.map(s => `<tr>
+            <td>${s.name}</td>
+            <td class="td-actions">
+                <button class="btn-secondary" onclick="editSchool(${s.id})">Edit</button>
+                <button class="btn-danger" onclick="deleteSchool(${s.id})">Delete</button>
+            </td>
+        </tr>`).join('');
     }
 
     function populateSchoolDropdown() {
         const select = document.getElementById('candSchool');
-        select.innerHTML = '<option value="">Select a school...</option>' + 
-            uiSchools.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+        select.innerHTML = '<option value="">Select School</option>' + schoolsData.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
     function renderCandidatesTable() {
         const tbody = document.getElementById('candidatesBody');
-        if (!uiCandidates.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No candidates added yet.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = uiCandidates.map(c => `
-            <tr>
-                <td style="font-weight:600; color:var(--gold)">${c.character}</td>
-                <td>${c.actor}</td>
-                <td style="color:var(--muted)">${c.school}</td>
-                <td class="td-actions">
-                    <button class="btn-secondary" onclick="editCandidateUI(${c.id})">Edit</button>
-                    <button class="btn-danger" onclick="deleteCandidateUI(${c.id})">Delete</button>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = candidatesData.map(c => `<tr>
+            <td style="color:var(--gold);font-weight:600">${c.character_name}</td>
+            <td>${c.actor_name}</td>
+            <td style="color:var(--muted)">${c.school_name}</td>
+            <td class="td-actions">
+                <button class="btn-secondary" onclick="editCandidate(${c.id})">Edit</button>
+                <button class="btn-danger" onclick="deleteCandidate(${c.id})">Delete</button>
+            </td>
+        </tr>`).join('');
     }
 
-    /* UI Actions (Mock Backend Update) */
-    function saveSchool() {
-        // Backend API Hook Placeholder
-        // fetch('/api/admin/schools', { method: 'POST', body: ... })
+    async function saveSchool() {
         const name = document.getElementById('schoolName').value.trim();
+        const logo_url = document.getElementById('schoolLogo').value.trim();
         const id = document.getElementById('schoolId').value;
-        if (!name) return alert('Name required');
-        
-        if (id) {
-            const sc = uiSchools.find(s => s.id == id);
-            if (sc) sc.name = name;
-        } else {
-            uiSchools.push({ id: Date.now(), name });
-        }
-        loadManagementDataUI();
+        if(!name) return;
+
+        await fetch('/api/admin/schools', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+            body: JSON.stringify({ id, name, logo_url })
+        });
         closeModal('schoolModal');
+        loadManagementData();
     }
 
-    function editSchoolUI(id) {
-        const sc = uiSchools.find(s => s.id == id);
-        if(!sc) return;
-        document.getElementById('schoolId').value = sc.id;
-        document.getElementById('schoolName').value = sc.name;
+    async function deleteSchool(id) {
+        if(!confirm('Delete school?')) return;
+        await fetch(`/api/admin/schools/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${adminPassword}` }
+        });
+        loadManagementData();
+    }
+
+    function editSchool(id) {
+        const s = schoolsData.find(x => x.id == id);
+        document.getElementById('schoolId').value = s.id;
+        document.getElementById('schoolName').value = s.name;
+        document.getElementById('schoolLogo').value = s.logo_url || '';
         document.getElementById('schoolModalTitle').innerText = 'Edit School';
         openModal('schoolModal');
     }
 
-    function deleteSchoolUI(id) {
-        if(confirm("Are you sure you want to delete this school?")) {
-            uiSchools = uiSchools.filter(s => s.id != id);
-            loadManagementDataUI();
-        }
-    }
-
-    function saveCandidate() {
-        // Backend API Hook Placeholder
-        // fetch('/api/admin/candidates', { method: 'POST', body: ... })
-        const character = document.getElementById('candCharacter').value.trim();
-        const actor = document.getElementById('candActor').value.trim();
-        const school = document.getElementById('candSchool').value;
+    async function saveCandidate() {
+        const character_name = document.getElementById('candCharacter').value.trim();
+        const actor_name = document.getElementById('candActor').value.trim();
+        const school_id = document.getElementById('candSchool').value;
+        const image_url = document.getElementById('candImage').value.trim();
         const id = document.getElementById('candidateId').value;
-        
-        if(!character || !actor || !school) return alert('All fields required');
+        if(!character_name || !actor_name || !school_id) return;
 
-        if(id) {
-            const cd = uiCandidates.find(c => c.id == id);
-            if(cd) Object.assign(cd, { character, actor, school });
-        } else {
-            uiCandidates.push({ id: Date.now(), character, actor, school });
-        }
-        loadManagementDataUI();
+        await fetch('/api/admin/candidates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+            body: JSON.stringify({ id, character_name, actor_name, school_id, image_url })
+        });
         closeModal('candidateModal');
+        loadManagementData();
     }
 
-    function editCandidateUI(id) {
-        const cd = uiCandidates.find(c => c.id == id);
-        if(!cd) return;
-        document.getElementById('candidateId').value = cd.id;
-        document.getElementById('candCharacter').value = cd.character;
-        document.getElementById('candActor').value = cd.actor;
-        document.getElementById('candSchool').value = cd.school;
+    async function deleteCandidate(id) {
+        if(!confirm('Delete candidate?')) return;
+        await fetch(`/api/admin/candidates/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${adminPassword}` }
+        });
+        loadManagementData();
+    }
+
+    function editCandidate(id) {
+        const c = candidatesData.find(x => x.id == id);
+        document.getElementById('candidateId').value = c.id;
+        document.getElementById('candCharacter').value = c.character_name;
+        document.getElementById('candActor').value = c.actor_name;
+        document.getElementById('candSchool').value = c.school_id;
+        document.getElementById('candImage').value = c.image_url || '';
         document.getElementById('candidateModalTitle').innerText = 'Edit Candidate';
         openModal('candidateModal');
-    }
-
-    function deleteCandidateUI(id) {
-        if(confirm("Are you sure you want to delete this candidate?")) {
-            uiCandidates = uiCandidates.filter(c => c.id != id);
-            loadManagementDataUI();
-        }
     }
 </script>
 </body>

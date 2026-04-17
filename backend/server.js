@@ -44,25 +44,26 @@ layout.forEach(({ row, blocks }) => {
     });
 });
 
-const VALID_SCHOOLS = [
-    'Gateway College Dehiwala',
-    'Musaeus College Colombo',
-    'Gateway College Colombo',
-    'Lyceum College Nugegoda'
-];
-
-const VALID_CANDIDATES = [
-    'Romeo (Renal Perera)',
-    'Juliet (Kimali Abeynayaka)',
-    'Hamlet (Dinesh Hettiarachchi)',
-    'Ophelia (Amaya Perera)',
-    'Macbeth (Ravindu Abeynayaka)',
-    'Lady Macbeth (Tharushi Hettiarachchi)',
-    'Othello (Nimesh Perera)',
-    'Desdemona (Dulmini Abeynayaka)',
-    'Mercutio (Chamod Hettiarachchi)',
-    'King Lear (Nadun Perera)'
-];
+// ── Public Data Endpoint ─────────────────────────────────────────────────────
+// Fetches all schools and candidates for the voting app
+app.get('/api/public/data', async (req, res) => {
+    try {
+        const schools = await pool.query('SELECT * FROM schools ORDER BY name ASC');
+        const candidates = await pool.query(`
+            SELECT c.*, s.name as school_name 
+            FROM candidates c 
+            JOIN schools s ON c.school_id = s.id 
+            ORDER BY c.character_name ASC
+        `);
+        res.json({
+            schools: schools.rows,
+            candidates: candidates.rows
+        });
+    } catch (err) {
+        console.error('[DATA FETCH ERROR]', err);
+        res.status(500).json({ error: 'Failed to fetch platform data.' });
+    }
+});
 
 // ── POST /api/vote ──────────────────────────────────────────────────────────
 // Body: { ticket: "T123", seat: "A3", school: "...", candidate: "Romeo (Renal Perera)" }
@@ -88,14 +89,20 @@ app.post('/api/vote', async (req, res) => {
         return res.status(400).json({ error: `Seat "${normSeat}" is not a valid seat in this venue.` });
     }
 
-    // 3. Validate school
-    if (!VALID_SCHOOLS.includes(school.trim())) {
-        return res.status(400).json({ error: 'Invalid school selection.' });
-    }
+    // 3. Validate school and candidate against DB
+    try {
+        const check = await pool.query(`
+            SELECT c.id FROM candidates c 
+            JOIN schools s ON c.school_id = s.id 
+            WHERE s.name = $1 AND (c.character_name || ' (' || c.actor_name || ')') = $2
+        `, [school.trim(), candidate.trim()]);
 
-    // 4. Validate candidate
-    if (!VALID_CANDIDATES.includes(candidate.trim())) {
-        return res.status(400).json({ error: 'Invalid candidate selection.' });
+        if (check.rows.length === 0) {
+            return res.status(400).json({ error: 'Invalid school or candidate selection.' });
+        }
+    } catch (err) {
+        console.error('[VALIDATION ERROR]', err);
+        return res.status(500).json({ error: 'Server validation failed.' });
     }
 
     // 5. Insert — the UNIQUE constraint catches duplicates
@@ -130,31 +137,10 @@ app.get('/api/admin/results', async (req, res) => {
     }
 
     try {
-        // Total votes per candidate
-        const byCandidate = await pool.query(`
-            SELECT candidate, COUNT(*) AS votes
-            FROM votes
-            GROUP BY candidate
-            ORDER BY votes DESC
-        `);
-
-        // Votes per candidate per school
-        const bySchool = await pool.query(`
-            SELECT candidate, school, COUNT(*) AS votes
-            FROM votes
-            GROUP BY candidate, school
-            ORDER BY candidate, votes DESC
-        `);
-
-        // Total vote count
+        const byCandidate = await pool.query(`SELECT candidate, COUNT(*) AS votes FROM votes GROUP BY candidate ORDER BY votes DESC`);
+        const bySchool = await pool.query(`SELECT candidate, school, COUNT(*) AS votes FROM votes GROUP BY candidate, school ORDER BY candidate, votes DESC`);
         const total = await pool.query(`SELECT COUNT(*) AS total FROM votes`);
-
-        // All individual votes (for audit)
-        const allVotes = await pool.query(`
-            SELECT ticket, seat, school, candidate, voted_at
-            FROM votes
-            ORDER BY voted_at DESC
-        `);
+        const allVotes = await pool.query(`SELECT ticket, seat, school, candidate, voted_at FROM votes ORDER BY voted_at DESC`);
 
         return res.json({
             totalVotes: parseInt(total.rows[0].total),
@@ -165,6 +151,66 @@ app.get('/api/admin/results', async (req, res) => {
     } catch (err) {
         console.error('[RESULTS ERROR]', err);
         return res.status(500).json({ error: 'Failed to retrieve results.' });
+    }
+});
+
+// ── Admin Management Endpoints ──────────────────────────────────────────────
+
+// Save School (Create or Update)
+app.post('/api/admin/schools', async (req, res) => {
+    if (req.headers.authorization !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).send('Unauthorized');
+    const { id, name, logo_url } = req.body;
+    try {
+        if (id) {
+            await pool.query('UPDATE schools SET name = $1, logo_url = $2 WHERE id = $3', [name, logo_url, id]);
+        } else {
+            await pool.query('INSERT INTO schools (name, logo_url) VALUES ($1, $2)', [name, logo_url]);
+        }
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/admin/schools/:id', async (req, res) => {
+    if (req.headers.authorization !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).send('Unauthorized');
+    try {
+        await pool.query('DELETE FROM schools WHERE id = $1', [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Save Candidate (Create or Update)
+app.post('/api/admin/candidates', async (req, res) => {
+    if (req.headers.authorization !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).send('Unauthorized');
+    const { id, character_name, actor_name, school_id, image_url } = req.body;
+    try {
+        if (id) {
+            await pool.query(
+                'UPDATE candidates SET character_name=$1, actor_name=$2, school_id=$3, image_url=$4 WHERE id=$5',
+                [character_name, actor_name, school_id, image_url, id]
+            );
+        } else {
+            await pool.query(
+                'INSERT INTO candidates (character_name, actor_name, school_id, image_url) VALUES ($1,$2,$3,$4)',
+                [character_name, actor_name, school_id, image_url]
+            );
+        }
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/admin/candidates/:id', async (req, res) => {
+    if (req.headers.authorization !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).send('Unauthorized');
+    try {
+        await pool.query('DELETE FROM candidates WHERE id = $1', [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
