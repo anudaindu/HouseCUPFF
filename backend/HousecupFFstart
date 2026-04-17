@@ -1,0 +1,3 @@
+#!/bin/bash
+# This script is a bridge to handle the Render Start Command 'HousecupFFstart'
+npm start

@@ -170,7 +170,7 @@ app.get('/api/admin/results', async (req, res) => {
 
 // ── GET /admin ──────────────────────────────────────────────────────────────
 // Serve the admin dashboard HTML (handled by express.static from public/)
-app.get('/admin', (req, res) => {
+app.get(['/admin', '/admin/'], (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 

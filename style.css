@@ -114,7 +114,7 @@ section::before {
     font-weight: 600;
     white-space: nowrap;
     text-transform: uppercase;
-    animation: fadeIn 2s ease 4s backwards;
+    animation: fadeIn 2s ease 1s backwards;
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
@@ -155,7 +155,7 @@ section::before {
     object-fit: contain;
     margin: 0 auto 1.5rem auto;
     display: block;
-    animation: fadeInDown 1.5s ease 2.8s backwards;
+    animation: fadeInDown 1.5s ease 0.2s backwards;
 }
 
 .countdown-container {
@@ -510,11 +510,11 @@ button.disabled {
 .hero-content h1, .hero-content .subtitle, .hero-content .tagline, .hero-content button, .countdown-container {
     animation: fadeIn 0.5s ease both;
 }
-.hero-content h1 { animation-delay: 0.1s; }
-.hero-content .subtitle { animation-delay: 0.2s; }
-.hero-content .tagline { animation-delay: 0.3s; }
-.hero-content button { animation-delay: 0.4s; }
-.countdown-container { animation-delay: 0.5s; }
+.hero-content h1 { animation-delay: 0.05s; }
+.hero-content .subtitle { animation-delay: 0.1s; }
+.hero-content .tagline { animation-delay: 0.15s; }
+.hero-content button { animation-delay: 0.2s; }
+.countdown-container { animation-delay: 0.3s; }
 
 /* Scroll Reveal — faster, GPU-composited */
 .reveal {
