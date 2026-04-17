@@ -45,17 +45,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const seatInput = document.getElementById('seatInput');
     if (seatInput) {
         let seatDebounce;
-        seatInput.addEventListener('input', function() {
+        seatInput.addEventListener('input', function () {
             this.value = this.value.toUpperCase();
             clearTimeout(seatDebounce);
             seatDebounce = setTimeout(() => syncInputToMap(this.value), 80);
         });
     }
-    
+
     // Auto uppercase ticket input
     const ticketInput = document.getElementById('ticketInput');
     if (ticketInput) {
-        ticketInput.addEventListener('input', function() {
+        ticketInput.addEventListener('input', function () {
             this.value = this.value.toUpperCase();
             document.getElementById('ticketError').classList.add('hidden');
         });
@@ -94,7 +94,7 @@ async function fetchData() {
 function initIntroAnimation() {
     const overlay = document.getElementById('intro-overlay');
     const content = document.getElementById('main-content');
-    
+
     // Check if intro has played this session
     if (sessionStorage.getItem('hp_intro_played')) {
         if (overlay) overlay.style.display = 'none';
@@ -107,7 +107,7 @@ function initIntroAnimation() {
         if (overlay) overlay.classList.add('fade-out');
         if (content) content.classList.add('content-visible');
         sessionStorage.setItem('hp_intro_played', 'true');
-        
+
         // Remove from DOM after fade to keep clean
         setTimeout(() => {
             if (overlay) overlay.remove();
@@ -138,14 +138,14 @@ function validateTicket() {
 function syncInputToMap(inputValue) {
     const errorMsg = document.getElementById('seatError');
     const btn = document.getElementById('btnToSchool');
-    
+
     // Validate if seat exists in map visually
     const seatEl = document.getElementById(`seat-${inputValue}`);
-    
+
     // Deselect current
     if (selectedSeat) {
         const oldSeat = document.getElementById(`seat-${selectedSeat}`);
-        if(oldSeat) oldSeat.classList.remove('selected');
+        if (oldSeat) oldSeat.classList.remove('selected');
     }
 
     if (seatEl && !seatEl.classList.contains('taken')) {
@@ -158,7 +158,7 @@ function syncInputToMap(inputValue) {
         btn.classList.add('disabled');
         if (inputValue.length >= 2) {
             errorMsg.classList.remove('hidden');
-            if(seatEl && seatEl.classList.contains('taken')) errorMsg.textContent = "Seat is already taken.";
+            if (seatEl && seatEl.classList.contains('taken')) errorMsg.textContent = "Seat is already taken.";
             else errorMsg.textContent = "Invalid Seat configuration.";
         } else {
             errorMsg.classList.add('hidden');
@@ -168,11 +168,11 @@ function syncInputToMap(inputValue) {
 
 function handleVisualSeatClick(row, num, element) {
     if (element.classList.contains('taken')) return;
-    
+
     const seatId = `${row}${num}`;
     const seatInput = document.getElementById('seatInput');
     seatInput.value = seatId;
-    
+
     syncInputToMap(seatId);
 }
 
@@ -240,18 +240,18 @@ function renderSchools() {
     const grid = document.getElementById('schoolGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    
+
     schools.forEach(school => {
         const div = document.createElement('div');
         div.className = 'selectable-card';
-        
+
         let logoHtml = '';
         if (school.logo_url) {
             logoHtml = `<img src="${school.logo_url}" class="school-logo" alt="${school.name} Logo">`;
         }
-        
+
         div.innerHTML = `${logoHtml} <span>${school.name}</span>`;
-        
+
         div.onclick = () => {
             document.querySelectorAll('#schoolGrid .selectable-card').forEach(el => el.classList.remove('selected'));
             div.classList.add('selected');
@@ -266,18 +266,18 @@ function renderCandidates() {
     const grid = document.getElementById('candidateGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    
+
     candidates.forEach(cand => {
         const initials = cand.actor_name.split(' ').map(n => n[0]).join('');
-        
+
         const div = document.createElement('div');
         div.className = 'actor-card selectable-card';
-        
+
         let avatarHtml = `<div class="avatar-large">${initials}</div>`;
         if (cand.image_url) {
             avatarHtml = `<div class="avatar-large"><img src="${cand.image_url}" class="avatar-img" alt="${cand.character_name}"></div>`;
         }
-        
+
         div.innerHTML = `
             ${avatarHtml}
             <div class="actor-info-text">
@@ -288,7 +288,7 @@ function renderCandidates() {
                 <button class="vote-btn">Vote</button>
             </div>
         `;
-        
+
         div.onclick = () => {
             // Deselect all
             document.querySelectorAll('#candidateGrid .selectable-card').forEach(el => {
@@ -299,7 +299,7 @@ function renderCandidates() {
             div.classList.add('selected');
             div.querySelector('.vote-btn').textContent = 'Selected';
             selectedCandidate = `${cand.character_name} (${cand.actor_name})`;
-            
+
             document.getElementById('btnToConfirmation').classList.remove('disabled');
         };
         grid.appendChild(div);
@@ -349,7 +349,7 @@ function initCountdown() {
         const h = Math.floor(distance / 3600000);
         const m = Math.floor((distance % 3600000) / 60000);
         const s = Math.floor((distance % 60000) / 1000);
-        const display = `${String(h).padStart(2,'0')} : ${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
+        const display = `${String(h).padStart(2, '0')} : ${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}`;
         if (display !== lastDisplay) {
             countdownEl.textContent = display;
             lastDisplay = display;
@@ -364,9 +364,9 @@ async function submitVote() {
     if (isSubmitting) return; // hard guard against double-tap
 
     const submitBtn = document.getElementById('submitVoteBtn');
-    const btnText   = document.getElementById('submitBtnText');
-    const spinner   = document.getElementById('submitSpinner');
-    const errorEl   = document.getElementById('voteSubmitError');
+    const btnText = document.getElementById('submitBtnText');
+    const spinner = document.getElementById('submitSpinner');
+    const errorEl = document.getElementById('voteSubmitError');
 
     if (!selectedTicket || !selectedSeat || !selectedSchool || !selectedCandidate) {
         if (errorEl) { errorEl.textContent = 'Please complete all steps first.'; errorEl.classList.remove('hidden'); }
