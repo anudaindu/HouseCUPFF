@@ -1,4 +1,6 @@
-const BACKEND_URL = window.location.origin;
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? window.location.origin 
+    : 'https://housecupff.onrender.com';
 
 let schools = [];
 let candidates = [];
@@ -81,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchData() {
     try {
-        const res = await fetch('/api/public/data');
+        const res = await fetch(`${BACKEND_URL}/api/public/data`);
         const data = await res.json();
         schools = data.schools;
         candidates = data.candidates;

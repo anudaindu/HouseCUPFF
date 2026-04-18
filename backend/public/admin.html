@@ -386,6 +386,10 @@
 </div>
 
 <script>
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? window.location.origin 
+        : 'https://housecupff.onrender.com';
+
     let adminPassword = '';
     let pieChartInstance = null;
     let schoolsData = [];
@@ -441,7 +445,7 @@
 
     async function loadResults() {
         try {
-            const res = await fetch(`/api/admin/results?password=${encodeURIComponent(adminPassword)}`);
+            const res = await fetch(`${BACKEND_URL}/api/admin/results?password=${encodeURIComponent(adminPassword)}`);
             if (res.status === 401) {
                 document.getElementById('loginError').style.display = 'block';
                 return false;
@@ -516,7 +520,7 @@
 
     /* ── Management Logic ── */
     async function loadManagementData() {
-        const res = await fetch('/api/public/data');
+        const res = await fetch(`${BACKEND_URL}/api/public/data`);
         const data = await res.json();
         schoolsData = data.schools;
         candidatesData = data.candidates;
@@ -560,7 +564,7 @@
         const id = document.getElementById('schoolId').value;
         if(!name) return;
 
-        await fetch('/api/admin/schools', {
+        await fetch(`${BACKEND_URL}/api/admin/schools`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
             body: JSON.stringify({ id, name, logo_url })
@@ -571,7 +575,7 @@
 
     async function deleteSchool(id) {
         if(!confirm('Delete school?')) return;
-        await fetch(`/api/admin/schools/${id}`, {
+        await fetch(`${BACKEND_URL}/api/admin/schools/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${adminPassword}` }
         });
@@ -595,7 +599,7 @@
         const id = document.getElementById('candidateId').value;
         if(!character_name || !actor_name || !school_id) return;
 
-        await fetch('/api/admin/candidates', {
+        await fetch(`${BACKEND_URL}/api/admin/candidates`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
             body: JSON.stringify({ id, character_name, actor_name, school_id, image_url })
@@ -606,7 +610,7 @@
 
     async function deleteCandidate(id) {
         if(!confirm('Delete candidate?')) return;
-        await fetch(`/api/admin/candidates/${id}`, {
+        await fetch(`${BACKEND_URL}/api/admin/candidates/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${adminPassword}` }
         });

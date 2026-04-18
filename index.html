@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Cup – Fan Favourite Award</title>
+    <meta name="description" content="Cast your vote for the House Cup Fan Favourite Award.">
+    <!-- Preconnect to speed up Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Only load the two weights we actually use -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="top-bar">✦ SCAN QR & VOTE LIVE ✦</div>
+
+    <!-- Progress indicator -->
+    <div class="progress-bar" id="progressBar" aria-label="Step progress">
+        <div class="pb-step active" data-step="1">1</div>
+        <div class="pb-step" data-step="2">2</div>
+        <div class="pb-step" data-step="3">3</div>
+        <div class="pb-step" data-step="4">4</div>
+        <div class="pb-step" data-step="5">5</div>
+    </div>
+
+    <header class="hero-section reveal active" id="hero">
+        <div class="spotlight"></div>
+        <div class="hero-content">
+            <img src="assets/logo.png" alt="House Cup Logo" class="hero-logo" fetchpriority="high" width="220"
+                height="220">
+            <h1>House Cup</h1>
+            <h2 class="subtitle">Fan Favourite Award</h2>
+            <p class="tagline">Your Vote. Your Voice. Your Star.</p>
+            <button class="primary-btn mt-4" onclick="scrollToSection('ticket-selection')">Start Voting</button>
+            <div class="countdown-container">
+                <p>Voting Window Closes In</p>
+                <div id="countdown" class="countdown">00:00:00</div>
+            </div>
+        </div>
+    </header>
+
+    <section class="ticket-selection-section reveal" id="ticket-selection">
+        <div class="container">
+            <h2>1. Enter Ticket Number</h2>
+            <p class="instructions">Please enter your unique ticket number to proceed.</p>
+
+            <div class="input-group">
+                <input type="text" id="ticketInput" placeholder="e.g. T123" maxlength="20" autocapitalize="characters">
+                <span class="error-msg hidden" id="ticketError">Invalid ticket format.</span>
+            </div>
+
+            <button class="next-btn mt-4 w-100" id="btnToSeat" onclick="validateTicket()">Validate Ticket</button>
+        </div>
+    </section>
+
+    <section class="seat-selection-section reveal" id="seat-selection">
+        <div class="container">
+            <h2>2. Select Your Seat</h2>
+            <p class="instructions">Type your seat or select from the map to verify your vote.</p>
+
+            <div class="input-group">
+                <input type="text" id="seatInput" placeholder="e.g. A4" maxlength="3" autocapitalize="characters">
+                <span class="error-msg hidden" id="seatError">Invalid Seat.</span>
+            </div>
+
+            <div class="legend" style="margin-top: 1.5rem;">
+                <span class="legend-item">
+                    <div class="box available"></div> Available
+                </span>
+                <span class="legend-item">
+                    <div class="box selected"></div> Selected
+                </span>
+                <span class="legend-item">
+                    <div class="box taken"></div> Taken
+                </span>
+            </div>
+
+            <!-- Seat Grid (Lionel Wendt layout) -->
+            <div class="seat-map-wrapper">
+                <div class="stage-indicator">STAGE</div>
+                <div class="seat-grid" id="seatGrid">
+                    <!-- Javascript will populate this -->
+                </div>
+            </div>
+
+            <button class="next-btn mt-4 disabled w-100" id="btnToSchool"
+                onclick="scrollToSection('school-selection')">Confirm Seat</button>
+        </div>
+    </section>
+
+    <section class="school-section reveal" id="school-selection">
+        <div class="container container-center">
+            <h2>3. Select Your School</h2>
+            <p class="instructions">Which school are you supporting tonight?</p>
+
+            <div class="grid-list" id="schoolGrid">
+                <!-- Javascript populates -->
+            </div>
+
+            <button class="next-btn mt-4 disabled w-100" id="btnToVoting" onclick="scrollToSection('voting')">Confirm
+                School</button>
+        </div>
+    </section>
+
+    <section class="voting-section reveal" id="voting">
+        <div class="container">
+            <h2>4. Choose Fan Favourite</h2>
+            <p class="instructions">Select one outstanding candidate.</p>
+
+            <div class="actor-grid" id="candidateGrid">
+                <!-- Javascript populates -->
+            </div>
+
+            <button class="next-btn mt-4 disabled w-100" id="btnToConfirmation" onclick="populateReviewState()">Review
+                Selection</button>
+        </div>
+    </section>
+
+    <section class="confirmation-section reveal" id="confirmation">
+        <div class="container container-center">
+            <h2>5. Review Your Vote</h2>
+            <div class="review-card">
+                <div class="review-row">
+                    <span class="review-label">Your Ticket:</span>
+                    <span class="review-value" id="reviewTicket">--</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Your Seat:</span>
+                    <span class="review-value" id="reviewSeat">--</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Your School:</span>
+                    <span class="review-value" id="reviewSchool">--</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Your Candidate:</span>
+                    <span class="review-value" id="reviewCandidate">--</span>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <div id="voteSubmitError" class="hidden"
+                    style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:.6rem;color:#f87171;font-size:.9rem;padding:.75rem 1rem;margin-bottom:.75rem;text-align:center;">
+                </div>
+                <button class="confirm-btn w-100" id="submitVoteBtn" onclick="submitVote()">
+                    <span id="submitBtnText">Submit Final Vote</span>
+                    <span id="submitSpinner" class="spinner hidden"></span>
+                </button>
+                <button class="secondary-btn w-100 mt-2" onclick="scrollToSection('ticket-selection')">Change
+                    Choices</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div class="modal hidden" id="successModal">
+        <div class="modal-content">
+            <h2>Vote Cast!</h2>
+            <p>Thank you for supporting our incredible talents.</p>
+            <div class="success-icon">✓</div>
+            <button class="primary-btn mt-4" style="width: 100%" onclick="location.reload()">Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Deferred script for faster initial paint -->
+    <script src="app.js" defer></script>
+</body>
+
+</html>
