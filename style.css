@@ -487,9 +487,18 @@ button {
 
 .action-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Align side-by-side */
     gap: 1rem;
     width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.action-buttons button {
+    flex: 1; /* Split width equally */
+    padding: 1.2rem 1.5rem; /* Slightly narrower padding for side-by-side */
+    font-size: 1.1rem;
 }
 
 .primary-btn, .confirm-btn, .next-btn {
@@ -531,7 +540,7 @@ button {
 
 .w-100 { width: 100%; max-width: 400px; display: block; }
 .mt-4 { margin-top: 2rem; }
-.mt-2 { margin-top: 1rem; }
+.mt-2 { margin-top: 0; } /* Remove top margin when in-line */
 
 button.disabled {
     opacity: 0.5;
