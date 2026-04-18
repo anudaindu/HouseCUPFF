@@ -378,8 +378,10 @@
             <select id="candSchool"></select>
         </div>
         <div class="form-group">
-            <label>Image URL (Optional)</label>
-            <input type="text" id="candImage" placeholder="https://example.com/photo.jpg">
+            <label>Image File (Optional)</label>
+            <input type="file" id="candFile" accept="image/*" onchange="previewImg(this, 'candPreview')">
+            <input type="hidden" id="candImage">
+            <img id="candPreview" style="max-height: 80px; margin-top: 10px; display: none; border-radius: 8px;">
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" onclick="closeModal('candidateModal')">Cancel</button>
@@ -397,8 +399,10 @@
             <input type="text" id="schoolName" placeholder="e.g. Hogwarts">
         </div>
         <div class="form-group">
-            <label>Logo URL (Optional)</label>
-            <input type="text" id="schoolLogo" placeholder="https://example.com/logo.png">
+            <label>School Logo File (Optional)</label>
+            <input type="file" id="schoolFile" accept="image/*" onchange="previewImg(this, 'schoolPreview')">
+            <input type="hidden" id="schoolLogo">
+            <img id="schoolPreview" style="max-height: 80px; margin-top: 10px; border-radius: 8px; display: none;">
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" onclick="closeModal('schoolModal')">Cancel</button>
@@ -630,25 +634,58 @@
         document.getElementById('schoolId').value = s.id;
         document.getElementById('schoolName').value = s.name;
         document.getElementById('schoolLogo').value = s.logo_url || '';
+        document.getElementById('schoolFile').value = '';
+        if (s.logo_url) {
+            const preview = document.getElementById('schoolPreview');
+            preview.src = s.logo_url.startsWith('http') ? s.logo_url : `${BACKEND_URL}${s.logo_url}`;
+            preview.style.display = 'block';
+        } else {
+            document.getElementById('schoolPreview').style.display = 'none';
+        }
         document.getElementById('schoolModalTitle').innerText = 'Edit School';
         openModal('schoolModal');
     }
 
     async function saveCandidate() {
-        const character_name = document.getElementById('candCharacter').value.trim();
-        const actor_name = document.getElementById('candActor').value.trim();
-        const school_id = document.getElementById('candSchool').value;
-        const image_url = document.getElementById('candImage').value.trim();
         const id = document.getElementById('candidateId').value;
-        if(!character_name || !actor_name || !school_id) return;
+        const character_name = document.getElementById('candCharacter').value;
+        const actor_name = document.getElementById('candActor').value;
+        const school_id = document.getElementById('candSchool').value;
+        let image_url = document.getElementById('candImage').value;
+        const fileInput = document.getElementById('candFile');
 
-        await fetch(`${BACKEND_URL}/api/admin/candidates`, {
+        if (!character_name || !actor_name || !school_id) return alert('Fields required');
+
+        // If a new file is selected, upload it first
+        if (fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            try {
+                const uploadRes = await fetch(`${BACKEND_URL}/api/admin/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminPassword}` },
+                    body: formData
+                });
+                const uploadData = await uploadRes.json();
+                if (uploadRes.ok) {
+                    image_url = uploadData.filePath;
+                } else {
+                    return alert('Upload failed: ' + uploadData.error);
+                }
+            } catch (err) {
+                return alert('Connection error during upload');
+            }
+        }
+
+        const res = await fetch(`${BACKEND_URL}/api/admin/candidates`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
             body: JSON.stringify({ id, character_name, actor_name, school_id, image_url })
         });
-        closeModal('candidateModal');
-        loadManagementData();
+        if (res.ok) {
+            closeModal('candidateModal');
+            loadManagementData();
+        }
     }
 
     async function deleteCandidate(id) {
@@ -667,8 +704,28 @@
         document.getElementById('candActor').value = c.actor_name;
         document.getElementById('candSchool').value = c.school_id;
         document.getElementById('candImage').value = c.image_url || '';
+        document.getElementById('candFile').value = '';
+        if (c.image_url) {
+            const preview = document.getElementById('candPreview');
+            preview.src = c.image_url.startsWith('http') ? c.image_url : `${BACKEND_URL}${c.image_url}`;
+            preview.style.display = 'block';
+        } else {
+            document.getElementById('candPreview').style.display = 'none';
+        }
         document.getElementById('candidateModalTitle').innerText = 'Edit Candidate';
         openModal('candidateModal');
+    }
+
+    function previewImg(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     /* ── Settings Logic ── */

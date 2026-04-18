@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         :root {
             --gold: #f5c842;
@@ -15,7 +22,7 @@
             --bg: #0a0a12;
             --surface: #13131f;
             --surface2: #1c1c2e;
-            --border: rgba(245,200,66,0.18);
+            --border: rgba(245, 200, 66, 0.18);
             --text: #e8e8f0;
             --muted: #7a7a8e;
             --success: #22c55e;
@@ -40,8 +47,18 @@
             gap: 1.5rem;
             padding: 2rem;
         }
-        #loginGate h1 { font-size: 1.8rem; color: var(--gold); letter-spacing: .08em; }
-        #loginGate p  { color: var(--muted); font-size: .95rem; }
+
+        #loginGate h1 {
+            font-size: 1.8rem;
+            color: var(--gold);
+            letter-spacing: .08em;
+        }
+
+        #loginGate p {
+            color: var(--muted);
+            font-size: .95rem;
+        }
+
         .login-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -53,7 +70,9 @@
             flex-direction: column;
             gap: 1rem;
         }
-        input, select {
+
+        input,
+        select {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: .6rem;
@@ -65,8 +84,14 @@
             width: 100%;
             transition: border-color .2s;
         }
-        input:focus, select:focus { border-color: var(--gold); }
-        .login-card button, .btn-primary {
+
+        input:focus,
+        select:focus {
+            border-color: var(--gold);
+        }
+
+        .login-card button,
+        .btn-primary {
             background: var(--gold);
             border: none;
             border-radius: .6rem;
@@ -78,14 +103,46 @@
             padding: .75rem 1.5rem;
             transition: background .2s, transform .1s;
         }
-        .login-card button:hover, .btn-primary:hover { background: #ffd84a; transform: translateY(-1px); }
-        .btn-danger { background: var(--danger); color: white; border: none; padding: .5rem 1rem; border-radius: .4rem; cursor: pointer; font-family: inherit; font-weight: 600; }
-        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid rgba(255,255,255,.1); padding: .5rem 1rem; border-radius: .4rem; cursor: pointer; font-family: inherit; font-weight: 600; }
-        
-        #loginError { color: var(--danger); font-size: .875rem; text-align: center; display: none; }
+
+        .login-card button:hover,
+        .btn-primary:hover {
+            background: #ffd84a;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: .5rem 1rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .btn-secondary {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, .1);
+            padding: .5rem 1rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        #loginError {
+            color: var(--danger);
+            font-size: .875rem;
+            text-align: center;
+            display: none;
+        }
 
         /* ── Dashboard ── */
-        #dashboard { display: none; }
+        #dashboard {
+            display: none;
+        }
 
         .top-bar {
             background: linear-gradient(90deg, #0a0a12, #1c1c2e, #0a0a12);
@@ -97,13 +154,19 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        .top-bar h1 { font-size: 1.1rem; color: var(--gold); letter-spacing: .06em; }
-        
+
+        .top-bar h1 {
+            font-size: 1.1rem;
+            color: var(--gold);
+            letter-spacing: .06em;
+        }
+
         /* Navigation Tabs */
         .nav-tabs {
             display: flex;
             gap: 1rem;
         }
+
         .nav-tab {
             color: var(--muted);
             font-weight: 600;
@@ -113,13 +176,45 @@
             border-radius: .5rem;
             transition: all 0.2s;
         }
-        .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
-        .nav-tab.active { color: var(--gold); background: rgba(245,200,66,.1); }
-        
-        .meta { color: var(--muted); font-size: .85rem; display: flex; align-items: center; gap: 1.2rem; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
-        
+
+        .nav-tab:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .nav-tab.active {
+            color: var(--gold);
+            background: rgba(245, 200, 66, .1);
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: .85rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .4;
+            }
+        }
+
         .refresh-btn {
             background: transparent;
             border: 1px solid var(--border);
@@ -131,13 +226,38 @@
             padding: .4rem .9rem;
             transition: border-color .2s, color .2s;
         }
-        .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-        .main { max-width: 1300px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-        .tab-content { display: none; animation: fadeIn .4s ease; }
-        .tab-content.active { display: block; }
+        .refresh-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .main {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn .4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* ── Results Tab Elements ── */
         .stats-row {
@@ -146,175 +266,354 @@
             gap: 1rem;
             margin-bottom: 2rem;
         }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: .85rem; padding: 1.25rem 1.5rem; }
-        .stat-card .label { color: var(--muted); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
-        .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--gold); margin-top: .25rem; }
-        .stat-card .sub { color: var(--muted); font-size: .8rem; margin-top: .15rem; }
 
-        h2.section-title {
-            color: var(--gold); font-size: 1rem; letter-spacing: .1em; text-transform: uppercase;
-            margin-bottom: 1rem; border-left: 3px solid var(--gold); padding-left: .75rem;
-            display: flex; justify-content: space-between; align-items: center;
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: .85rem;
+            padding: 1.25rem 1.5rem;
         }
 
-        .charts-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-        .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
-        
-        .bar-list { display: flex; flex-direction: column; gap: .75rem; max-height: 400px; overflow-y: auto; padding-right: .5rem; }
-        .bar-item { display: grid; grid-template-columns: 11rem 1fr 3rem; align-items: center; gap: 1rem; }
-        .bar-label { font-size: .9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bar-track { background: rgba(255,255,255,.06); border-radius: 99px; height: 12px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); transition: width .8s; }
-        .bar-count { font-size: .9rem; font-weight: 600; color: var(--gold); text-align: right; }
+        .stat-card .label {
+            color: var(--muted);
+            font-size: .8rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
 
-        .pie-container { position: relative; height: 300px; width: 100%; display: flex; align-items: center; justify-content: center; }
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-top: .25rem;
+        }
+
+        .stat-card .sub {
+            color: var(--muted);
+            font-size: .8rem;
+            margin-top: .15rem;
+        }
+
+        h2.section-title {
+            color: var(--gold);
+            font-size: 1rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--gold);
+            padding-left: .75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .bar-list {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: .5rem;
+        }
+
+        .bar-item {
+            display: grid;
+            grid-template-columns: 11rem 1fr 3rem;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            font-size: .9rem;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bar-track {
+            background: rgba(255, 255, 255, .06);
+            border-radius: 99px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            transition: width .8s;
+        }
+
+        .bar-count {
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-align: right;
+        }
+
+        .pie-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* ── Tables ── */
-        .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; overflow: hidden; margin-bottom: 2rem; }
-        table { width: 100%; border-collapse: collapse; font-size: .875rem; text-align: left; }
-        thead { background: var(--surface2); }
-        th { color: var(--muted); font-weight: 600; letter-spacing: .05em; padding: .9rem 1.2rem; text-transform: uppercase; font-size: .75rem; }
-        td { padding: .85rem 1.2rem; border-top: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
-        tr:hover td { background: rgba(245,200,66,.04); }
-        
-        .empty-state { text-align: center; color: var(--muted); padding: 3rem; font-size: .95rem; }
-        .td-actions { display: flex; gap: .5rem; justify-content: flex-end; }
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .875rem;
+            text-align: left;
+        }
+
+        thead {
+            background: var(--surface2);
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: .05em;
+            padding: .9rem 1.2rem;
+            text-transform: uppercase;
+            font-size: .75rem;
+        }
+
+        td {
+            padding: .85rem 1.2rem;
+            border-top: 1px solid rgba(255, 255, 255, .05);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(245, 200, 66, .04);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            padding: 3rem;
+            font-size: .95rem;
+        }
+
+        .td-actions {
+            display: flex;
+            gap: .5rem;
+            justify-content: flex-end;
+        }
 
         /* ── Modals ── */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
+
         .modal-content {
-            background: var(--surface); border: 1px solid var(--border);
-            padding: 2rem; border-radius: 1rem; width: 100%; max-width: 500px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 500px;
         }
-        .modal-title { color: var(--gold); font-size: 1.4rem; margin-bottom: 1.5rem; }
-        .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; color: var(--muted); font-size: .85rem; margin-bottom: .5rem; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+
+        .modal-title {
+            color: var(--gold);
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--muted);
+            font-size: .85rem;
+            margin-bottom: .5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
 
         @media (max-width: 800px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .bar-item { grid-template-columns: 8rem 1fr 2.5rem; }
-            .top-bar { flex-direction: column; align-items: flex-start; }
-            .nav-tabs { width: 100%; flex-wrap: wrap; }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-item {
+                grid-template-columns: 8rem 1fr 2.5rem;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<!-- Login Gate -->
-<div id="loginGate">
-    <h1>✦ Admin Dashboard</h1>
-    <p>House Cup – Fan Favourite Award</p>
-    <div class="login-card">
-        <input type="password" id="pwInput" placeholder="Enter admin password" autocomplete="current-password">
-        <button onclick="attemptLogin()">Access Dashboard →</button>
-        <div id="loginError">Incorrect password. Try again.</div>
-    </div>
-</div>
-
-<!-- Dashboard -->
-<div id="dashboard">
-    <div class="top-bar">
-        <h1>✦ House Cup Admin</h1>
-        <div class="nav-tabs">
-            <div class="nav-tab active" onclick="switchTab('results', this)">📊 Results</div>
-            <div class="nav-tab" onclick="switchTab('candidates', this)">🎭 Candidates</div>
-            <div class="nav-tab" onclick="switchTab('schools', this)">🏫 Schools</div>
-            <div class="nav-tab" onclick="switchTab('settings', this)">⚙ Settings</div>
-        </div>
-        <div class="meta">
-            <div class="dot"></div>
-            <span id="refreshMsg" style="display:none;">Live synced via API</span>
-            <button class="refresh-btn" onclick="loadResults()">↻ Sync Data</button>
+    <!-- Login Gate -->
+    <div id="loginGate">
+        <h1>✦ Admin Dashboard</h1>
+        <p>House Cup – Fan Favourite Award</p>
+        <div class="login-card">
+            <input type="password" id="pwInput" placeholder="Enter admin password" autocomplete="current-password">
+            <button onclick="attemptLogin()">Access Dashboard →</button>
+            <div id="loginError">Incorrect password. Try again.</div>
         </div>
     </div>
 
-    <div class="main">
-        
-        <!-- ======================= -->
-        <!-- TAB: RESULTS            -->
-        <!-- ======================= -->
-        <div id="tab-results" class="tab-content active">
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="label">Total Votes</div>
-                    <div class="value" id="statTotal">—</div>
-                    <div class="sub">across all seats</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Leading Candidate</div>
-                    <div class="value" id="statLeader" style="font-size:1.2rem;margin-top:.5rem">—</div>
-                    <div class="sub" id="statLeaderVotes"></div>
-                </div>
+    <!-- Dashboard -->
+    <div id="dashboard">
+        <div class="top-bar">
+            <h1>✦ House Cup Admin</h1>
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="switchTab('results', this)">📊 Results</div>
+                <div class="nav-tab" onclick="switchTab('candidates', this)">🎭 Candidates</div>
+                <div class="nav-tab" onclick="switchTab('schools', this)">🏫 Schools</div>
+                <div class="nav-tab" onclick="switchTab('settings', this)">⚙ Settings</div>
             </div>
-
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h2 class="section-title">Votes by Candidate</h2>
-                    <div class="bar-list" id="barList">
-                        <div class="empty-state">Loading…</div>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h2 class="section-title">Vote Distribution</h2>
-                    <div class="pie-container">
-                        <canvas id="distributionChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <h2 class="section-title">Individual Vote Log</h2>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Ticket</th>
-                            <th>Seat</th>
-                            <th>School</th>
-                            <th>Candidate</th>
-                            <th style="text-align:right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="auditBody">
-                        <tr><td colspan="5" class="empty-state">Loading…</td></tr>
-                    </tbody>
-                </table>
+            <div class="meta">
+                <div class="dot"></div>
+                <span id="refreshMsg" style="display:none;">Live synced via API</span>
+                <button class="refresh-btn" onclick="loadResults()">↻ Sync Data</button>
             </div>
         </div>
 
-        <!-- ======================= -->
-        <!-- TAB: CANDIDATES         -->
-        <!-- ======================= -->
-        <div id="tab-candidates" class="tab-content">
-            <h2 class="section-title">
-                Manage Candidates
-                <button class="btn-primary" style="font-size: .8rem; padding: .5rem 1rem;" onclick="openModal('candidateModal')">+ Add Candidate</button>
-            </h2>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Character Name</th>
-                            <th>Actor Name</th>
-                            <th>School</th>
-                            <th style="text-align: right;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="candidatesBody">
-                        <!-- Populated by JS -->
-                        <tr><td colspan="4" class="empty-state">No candidates loaded yet.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div class="main">
 
-        <!-- ======================= -->
-        <!-- TAB: SCHOOLS            -->
-        <!-- ======================= -->
+            <!-- ======================= -->
+            <!-- TAB: RESULTS            -->
+            <!-- ======================= -->
+            <div id="tab-results" class="tab-content active">
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="label">Total Votes</div>
+                        <div class="value" id="statTotal">—</div>
+                        <div class="sub">across all seats</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Leading Candidate</div>
+                        <div class="value" id="statLeader" style="font-size:1.2rem;margin-top:.5rem">—</div>
+                        <div class="sub" id="statLeaderVotes"></div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h2 class="section-title">Votes by Candidate</h2>
+                        <div class="bar-list" id="barList">
+                            <div class="empty-state">Loading…</div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h2 class="section-title">Vote Distribution</h2>
+                        <div class="pie-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Individual Vote Log</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket</th>
+                                <th>Seat</th>
+                                <th>School</th>
+                                <th>Candidate</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditBody">
+                            <tr>
+                                <td colspan="5" class="empty-state">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ======================= -->
+            <!-- TAB: CANDIDATES         -->
+            <!-- ======================= -->
+            <div id="tab-candidates" class="tab-content">
+                <h2 class="section-title">
+                    Manage Candidates
+                    <button class="btn-primary" style="font-size: .8rem; padding: .5rem 1rem;"
+                        onclick="openModal('candidateModal')">+ Add Candidate</button>
+                </h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Character Name</th>
+                                <th>Actor Name</th>
+                                <th>School</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="candidatesBody">
+                            <!-- Populated by JS -->
+                            <tr>
+                                <td colspan="4" class="empty-state">No candidates loaded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ======================= -->
+            <!-- TAB: SCHOOLS            -->
+            <!-- ======================= -->
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -325,7 +624,9 @@
                     </thead>
                     <tbody id="schoolsBody">
                         <!-- Populated by JS -->
-                        <tr><td colspan="2" class="empty-state">No schools loaded yet.</td></tr>
+                        <tr>
+                            <td colspan="2" class="empty-state">No schools loaded yet.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -338,7 +639,7 @@
             <h2 class="section-title">Voting Window Configuration</h2>
             <div class="chart-card" style="max-width: 600px;">
                 <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-                    Define when the voting platform is open for submissions. 
+                    Define when the voting platform is open for submissions.
                     <br><strong>Timezone: Sri Lanka (GMT+5:30)</strong>
                 </p>
                 <div class="form-group">
@@ -351,189 +652,191 @@
                 </div>
                 <div style="margin-top: 2rem; display: flex; gap: 1rem;">
                     <button class="btn-primary" onclick="saveSettings()">Save Window Configuration</button>
-                    <span id="settingsStatus" style="color: var(--success); font-size: 0.9rem; align-self: center; display: none;">✓ Saved</span>
+                    <span id="settingsStatus"
+                        style="color: var(--success); font-size: 0.9rem; align-self: center; display: none;">✓
+                        Saved</span>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
 
-<!-- ======================= -->
-<!-- MODALS                  -->
-<!-- ======================= -->
-<div class="modal-overlay" id="candidateModal">
-    <div class="modal-content">
-        <h3 class="modal-title" id="candidateModalTitle">Add Candidate</h3>
-        <input type="hidden" id="candidateId">
-        <div class="form-group">
-            <label>Character Name</label>
-            <input type="text" id="candCharacter" placeholder="e.g. Romeo">
-        </div>
-        <div class="form-group">
-            <label>Actor Name</label>
-            <input type="text" id="candActor" placeholder="e.g. Leonardo DiCaprio">
-        </div>
-        <div class="form-group">
-            <label>School</label>
-            <select id="candSchool"></select>
-        </div>
-        <div class="form-group">
-            <label>Image URL (Optional)</label>
-            <input type="text" id="candImage" placeholder="https://example.com/photo.jpg">
-        </div>
-        <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal('candidateModal')">Cancel</button>
-            <button class="btn-primary" onclick="saveCandidate()">Save Candidate</button>
+    <!-- ======================= -->
+    <!-- MODALS                  -->
+    <!-- ======================= -->
+    <div class="modal-overlay" id="candidateModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="candidateModalTitle">Add Candidate</h3>
+            <input type="hidden" id="candidateId">
+            <div class="form-group">
+                <label>Character Name</label>
+                <input type="text" id="candCharacter" placeholder="e.g. Romeo">
+            </div>
+            <div class="form-group">
+                <label>Actor Name</label>
+                <input type="text" id="candActor" placeholder="e.g. Leonardo DiCaprio">
+            </div>
+            <div class="form-group">
+                <label>School</label>
+                <select id="candSchool"></select>
+            </div>
+            <div class="form-group">
+                <label>Image URL (Optional)</label>
+                <input type="text" id="candImage" placeholder="https://example.com/photo.jpg">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('candidateModal')">Cancel</button>
+                <button class="btn-primary" onclick="saveCandidate()">Save Candidate</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal-overlay" id="schoolModal">
-    <div class="modal-content">
-        <h3 class="modal-title" id="schoolModalTitle">Add School</h3>
-        <input type="hidden" id="schoolId">
-        <div class="form-group">
-            <label>School Name</label>
-            <input type="text" id="schoolName" placeholder="e.g. Hogwarts">
-        </div>
-        <div class="form-group">
-            <label>Logo URL (Optional)</label>
-            <input type="text" id="schoolLogo" placeholder="https://example.com/logo.png">
-        </div>
-        <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal('schoolModal')">Cancel</button>
-            <button class="btn-primary" onclick="saveSchool()">Save School</button>
+    <div class="modal-overlay" id="schoolModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="schoolModalTitle">Add School</h3>
+            <input type="hidden" id="schoolId">
+            <div class="form-group">
+                <label>School Name</label>
+                <input type="text" id="schoolName" placeholder="e.g. Hogwarts">
+            </div>
+            <div class="form-group">
+                <label>Logo URL (Optional)</label>
+                <input type="text" id="schoolLogo" placeholder="https://example.com/logo.png">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('schoolModal')">Cancel</button>
+                <button class="btn-primary" onclick="saveSchool()">Save School</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? window.location.origin 
-        : 'https://housecupff.onrender.com';
+    <script>
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? window.location.origin
+            : 'https://housecupff.onrender.com';
 
-    let adminPassword = '';
-    let pieChartInstance = null;
-    let schoolsData = [];
-    let candidatesData = [];
+        let adminPassword = '';
+        let pieChartInstance = null;
+        let schoolsData = [];
+        let candidatesData = [];
 
-    document.getElementById('pwInput').addEventListener('keydown', e => {
-        if (e.key === 'Enter') attemptLogin();
-    });
+        document.getElementById('pwInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') attemptLogin();
+        });
 
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-        if(tabId === 'candidates' || tabId === 'schools') loadManagementData();
-        if(tabId === 'settings') loadSettingsData();
-    }
-
-    /* ── Modals ── */
-    function openModal(id) { 
-        document.getElementById(id).style.display = 'flex'; 
-    }
-    
-    function closeModal(id) { 
-        document.getElementById(id).style.display = 'none'; 
-        // Reset forms
-        if(id === 'candidateModal') {
-            document.getElementById('candidateId').value = '';
-            document.getElementById('candCharacter').value = '';
-            document.getElementById('candActor').value = '';
-            document.getElementById('candSchool').value = '';
-            document.getElementById('candImage').value = '';
-            document.getElementById('candidateModalTitle').innerText = 'Add Candidate';
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            if (tabId === 'candidates' || tabId === 'schools') loadManagementData();
+            if (tabId === 'settings') loadSettingsData();
         }
-        if(id === 'schoolModal') {
-            document.getElementById('schoolId').value = '';
-            document.getElementById('schoolName').value = '';
-            document.getElementById('schoolLogo').value = '';
-            document.getElementById('schoolModalTitle').innerText = 'Add School';
-        }
-    }
 
-    async function attemptLogin() {
-        const pw = document.getElementById('pwInput').value.trim();
-        if (!pw) return;
-        adminPassword = pw;
-        const success = await loadResults();
-        if (success) {
-            document.getElementById('loginGate').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            document.getElementById('loginError').style.display = 'none';
+        /* ── Modals ── */
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
         }
-    }
 
-    async function loadResults() {
-        try {
-            const res = await fetch(`${BACKEND_URL}/api/admin/results?password=${encodeURIComponent(adminPassword)}`);
-            if (res.status === 401) {
-                document.getElementById('loginError').style.display = 'block';
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            // Reset forms
+            if (id === 'candidateModal') {
+                document.getElementById('candidateId').value = '';
+                document.getElementById('candCharacter').value = '';
+                document.getElementById('candActor').value = '';
+                document.getElementById('candSchool').value = '';
+                document.getElementById('candImage').value = '';
+                document.getElementById('candidateModalTitle').innerText = 'Add Candidate';
+            }
+            if (id === 'schoolModal') {
+                document.getElementById('schoolId').value = '';
+                document.getElementById('schoolName').value = '';
+                document.getElementById('schoolLogo').value = '';
+                document.getElementById('schoolModalTitle').innerText = 'Add School';
+            }
+        }
+
+        async function attemptLogin() {
+            const pw = document.getElementById('pwInput').value.trim();
+            if (!pw) return;
+            adminPassword = pw;
+            const success = await loadResults();
+            if (success) {
+                document.getElementById('loginGate').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('loginError').style.display = 'none';
+            }
+        }
+
+        async function loadResults() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/admin/results?password=${encodeURIComponent(adminPassword)}`);
+                if (res.status === 401) {
+                    document.getElementById('loginError').style.display = 'block';
+                    return false;
+                }
+                const data = await res.json();
+                renderStats(data);
+                renderBarChart(data.byCandidate);
+                renderPieChart(data.bySchool);
+                renderAuditTable(data.allVotes);
+                return true;
+            } catch (err) {
+                console.error(err);
                 return false;
             }
-            const data = await res.json();
-            renderStats(data);
-            renderBarChart(data.byCandidate);
-            renderPieChart(data.bySchool);
-            renderAuditTable(data.allVotes);
-            return true;
-        } catch (err) {
-            console.error(err);
-            return false;
         }
-    }
 
-    function renderStats(data) {
-        document.getElementById('statTotal').textContent = data.totalVotes;
-        if (data.byCandidate.length > 0) {
-            const top = data.byCandidate[0];
-            document.getElementById('statLeader').textContent = top.candidate.split('(')[0].trim();
-            document.getElementById('statLeaderVotes').textContent = `${top.votes} votes`;
-        } else {
-            document.getElementById('statLeader').textContent = 'No votes yet';
+        function renderStats(data) {
+            document.getElementById('statTotal').textContent = data.totalVotes;
+            if (data.byCandidate.length > 0) {
+                const top = data.byCandidate[0];
+                document.getElementById('statLeader').textContent = top.candidate.split('(')[0].trim();
+                document.getElementById('statLeaderVotes').textContent = `${top.votes} votes`;
+            } else {
+                document.getElementById('statLeader').textContent = 'No votes yet';
+            }
         }
-    }
 
-    function renderBarChart(byCandidate) {
-        const el = document.getElementById('barList');
-        if (!byCandidate.length) { el.innerHTML = '<div class="empty-state">No votes yet.</div>'; return; }
-        const max = Math.max(...byCandidate.map(c => parseInt(c.votes)));
-        el.innerHTML = byCandidate.map(c => {
-            const pct = (parseInt(c.votes) / max * 100).toFixed(1);
-            return `<div class="bar-item">
+        function renderBarChart(byCandidate) {
+            const el = document.getElementById('barList');
+            if (!byCandidate.length) { el.innerHTML = '<div class="empty-state">No votes yet.</div>'; return; }
+            const max = Math.max(...byCandidate.map(c => parseInt(c.votes)));
+            el.innerHTML = byCandidate.map(c => {
+                const pct = (parseInt(c.votes) / max * 100).toFixed(1);
+                return `<div class="bar-item">
                 <div class="bar-label">${c.candidate.split('(')[0].trim()}</div>
                 <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
                 <div class="bar-count">${c.votes}</div>
             </div>`;
-        }).join('');
-    }
+            }).join('');
+        }
 
-    function renderPieChart(bySchool) {
-        if (!bySchool.length) return;
-        const ctx = document.getElementById('distributionChart').getContext('2d');
-        const counts = {};
-        bySchool.forEach(r => { counts[r.school] = (counts[r.school] || 0) + parseInt(r.votes); });
-        
-        const labels = Object.keys(counts);
-        const data = Object.values(counts);
+        function renderPieChart(bySchool) {
+            if (!bySchool.length) return;
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            const counts = {};
+            bySchool.forEach(r => { counts[r.school] = (counts[r.school] || 0) + parseInt(r.votes); });
 
-        if (pieChartInstance) pieChartInstance.destroy();
-        pieChartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{ data: data, backgroundColor: ['#f5c842', '#ef4444', '#3b82f6', '#10b981'], borderWidth: 0 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#e8e8f0' } } } }
-        });
-    }
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
 
-    function renderAuditTable(allVotes) {
-        const tbody = document.getElementById('auditBody');
-        if (!allVotes.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No votes.</td></tr>'; return; }
-        tbody.innerHTML = allVotes.map(v => `<tr>
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: data, backgroundColor: ['#f5c842', '#ef4444', '#3b82f6', '#10b981'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#e8e8f0' } } } }
+            });
+        }
+
+        function renderAuditTable(allVotes) {
+            const tbody = document.getElementById('auditBody');
+            if (!allVotes.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No votes.</td></tr>'; return; }
+            tbody.innerHTML = allVotes.map(v => `<tr>
             <td style="color:var(--muted)">${v.ticket}</td>
             <td><span style="color:var(--gold)">${v.seat}</span></td>
             <td>${v.school}</td>
@@ -542,55 +845,55 @@
                 <button class="btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteVote(${v.id})">Clear Vote</button>
             </td>
         </tr>`).join('');
-    }
-
-    async function deleteVote(id) {
-        if (!confirm('Permanently delete this vote record?')) return;
-        try {
-            const res = await fetch(`${BACKEND_URL}/api/admin/votes/${id}?password=${encodeURIComponent(adminPassword)}`, {
-                method: 'DELETE'
-            });
-            if (res.ok) {
-                loadResults(); // Refresh everything
-            } else {
-                alert('Failed to delete vote.');
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Error connecting to server.');
         }
-    }
 
-    /* ── Management Logic ── */
-    async function loadManagementData() {
-        const res = await fetch(`${BACKEND_URL}/api/public/data`);
-        const data = await res.json();
-        schoolsData = data.schools;
-        candidatesData = data.candidates;
-        renderSchoolsTable();
-        renderCandidatesTable();
-        populateSchoolDropdown();
-    }
+        async function deleteVote(id) {
+            if (!confirm('Permanently delete this vote record?')) return;
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/admin/votes/${id}?password=${encodeURIComponent(adminPassword)}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    loadResults(); // Refresh everything
+                } else {
+                    alert('Failed to delete vote.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error connecting to server.');
+            }
+        }
 
-    function renderSchoolsTable() {
-        const tbody = document.getElementById('schoolsBody');
-        tbody.innerHTML = schoolsData.map(s => `<tr>
+        /* ── Management Logic ── */
+        async function loadManagementData() {
+            const res = await fetch(`${BACKEND_URL}/api/public/data`);
+            const data = await res.json();
+            schoolsData = data.schools;
+            candidatesData = data.candidates;
+            renderSchoolsTable();
+            renderCandidatesTable();
+            populateSchoolDropdown();
+        }
+
+        function renderSchoolsTable() {
+            const tbody = document.getElementById('schoolsBody');
+            tbody.innerHTML = schoolsData.map(s => `<tr>
             <td>${s.name}</td>
             <td class="td-actions">
                 <button class="btn-secondary" onclick="editSchool(${s.id})">Edit</button>
                 <button class="btn-danger" onclick="deleteSchool(${s.id})">Delete</button>
             </td>
         </tr>`).join('');
-    }
+        }
 
-    function populateSchoolDropdown() {
-        const select = document.getElementById('candSchool');
-        select.innerHTML = '<option value="">Select School</option>' + schoolsData.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-    }
+        function populateSchoolDropdown() {
+            const select = document.getElementById('candSchool');
+            select.innerHTML = '<option value="">Select School</option>' + schoolsData.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        }
 
-    function renderCandidatesTable() {
-        const tbody = document.getElementById('candidatesBody');
-        tbody.innerHTML = candidatesData.map(c => `<tr>
+        function renderCandidatesTable() {
+            const tbody = document.getElementById('candidatesBody');
+            tbody.innerHTML = candidatesData.map(c => `<tr>
             <td style="color:var(--gold);font-weight:600">${c.character_name}</td>
             <td>${c.actor_name}</td>
             <td style="color:var(--muted)">${c.school_name}</td>
@@ -599,123 +902,124 @@
                 <button class="btn-danger" onclick="deleteCandidate(${c.id})">Delete</button>
             </td>
         </tr>`).join('');
-    }
-
-    async function saveSchool() {
-        const name = document.getElementById('schoolName').value.trim();
-        const logo_url = document.getElementById('schoolLogo').value.trim();
-        const id = document.getElementById('schoolId').value;
-        if(!name) return;
-
-        await fetch(`${BACKEND_URL}/api/admin/schools`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
-            body: JSON.stringify({ id, name, logo_url })
-        });
-        closeModal('schoolModal');
-        loadManagementData();
-    }
-
-    async function deleteSchool(id) {
-        if(!confirm('Delete school?')) return;
-        await fetch(`${BACKEND_URL}/api/admin/schools/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${adminPassword}` }
-        });
-        loadManagementData();
-    }
-
-    function editSchool(id) {
-        const s = schoolsData.find(x => x.id == id);
-        document.getElementById('schoolId').value = s.id;
-        document.getElementById('schoolName').value = s.name;
-        document.getElementById('schoolLogo').value = s.logo_url || '';
-        document.getElementById('schoolModalTitle').innerText = 'Edit School';
-        openModal('schoolModal');
-    }
-
-    async function saveCandidate() {
-        const character_name = document.getElementById('candCharacter').value.trim();
-        const actor_name = document.getElementById('candActor').value.trim();
-        const school_id = document.getElementById('candSchool').value;
-        const image_url = document.getElementById('candImage').value.trim();
-        const id = document.getElementById('candidateId').value;
-        if(!character_name || !actor_name || !school_id) return;
-
-        await fetch(`${BACKEND_URL}/api/admin/candidates`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
-            body: JSON.stringify({ id, character_name, actor_name, school_id, image_url })
-        });
-        closeModal('candidateModal');
-        loadManagementData();
-    }
-
-    async function deleteCandidate(id) {
-        if(!confirm('Delete candidate?')) return;
-        await fetch(`${BACKEND_URL}/api/admin/candidates/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${adminPassword}` }
-        });
-        loadManagementData();
-    }
-
-    function editCandidate(id) {
-        const c = candidatesData.find(x => x.id == id);
-        document.getElementById('candidateId').value = c.id;
-        document.getElementById('candCharacter').value = c.character_name;
-        document.getElementById('candActor').value = c.actor_name;
-        document.getElementById('candSchool').value = c.school_id;
-        document.getElementById('candImage').value = c.image_url || '';
-        document.getElementById('candidateModalTitle').innerText = 'Edit Candidate';
-        openModal('candidateModal');
-    }
-
-    /* ── Settings Logic ── */
-    async function loadSettingsData() {
-        const res = await fetch(`${BACKEND_URL}/api/public/data`);
-        const data = await res.json();
-        if (data.settings) {
-            const formatForSL = (dateStr) => {
-                if (!dateStr) return '';
-                const d = new Date(dateStr);
-                // Convert to Sri Lanka time (UTC + 5:30)
-                const slDate = new Date(d.getTime() + (5.5 * 60 * 60 * 1000));
-                return slDate.toISOString().slice(0, 16);
-            };
-
-            if (data.settings.voting_start) document.getElementById('votingStart').value = formatForSL(data.settings.voting_start);
-            if (data.settings.voting_end)   document.getElementById('votingEnd').value = formatForSL(data.settings.voting_end);
         }
-    }
 
-    async function saveSettings() {
-        const start = document.getElementById('votingStart').value; // YYYY-MM-DDTHH:mm
-        const end = document.getElementById('votingEnd').value;
-        if (!start || !end) { alert('Please set both start and end times.'); return; }
+        async function saveSchool() {
+            const name = document.getElementById('schoolName').value.trim();
+            const logo_url = document.getElementById('schoolLogo').value.trim();
+            const id = document.getElementById('schoolId').value;
+            if (!name) return;
 
-        // Append Sri Lankan offset (+05:30)
-        const startISO = `${start}:00+05:30`;
-        const endISO = `${end}:00+05:30`;
-
-        try {
-            const res = await fetch(`${BACKEND_URL}/api/admin/settings`, {
+            await fetch(`${BACKEND_URL}/api/admin/schools`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
-                body: JSON.stringify({ voting_start: startISO, voting_end: endISO })
+                body: JSON.stringify({ id, name, logo_url })
             });
-            if (res.ok) {
-                const status = document.getElementById('settingsStatus');
-                status.style.display = 'inline';
-                setTimeout(() => status.style.display = 'none', 3000);
-            } else {
-                alert('Failed to save settings.');
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Error connecting to server.');
+            closeModal('schoolModal');
+            loadManagementData();
         }
-    }
-</script>
+
+        async function deleteSchool(id) {
+            if (!confirm('Delete school?')) return;
+            await fetch(`${BACKEND_URL}/api/admin/schools/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${adminPassword}` }
+            });
+            loadManagementData();
+        }
+
+        function editSchool(id) {
+            const s = schoolsData.find(x => x.id == id);
+            document.getElementById('schoolId').value = s.id;
+            document.getElementById('schoolName').value = s.name;
+            document.getElementById('schoolLogo').value = s.logo_url || '';
+            document.getElementById('schoolModalTitle').innerText = 'Edit School';
+            openModal('schoolModal');
+        }
+
+        async function saveCandidate() {
+            const character_name = document.getElementById('candCharacter').value.trim();
+            const actor_name = document.getElementById('candActor').value.trim();
+            const school_id = document.getElementById('candSchool').value;
+            const image_url = document.getElementById('candImage').value.trim();
+            const id = document.getElementById('candidateId').value;
+            if (!character_name || !actor_name || !school_id) return;
+
+            await fetch(`${BACKEND_URL}/api/admin/candidates`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+                body: JSON.stringify({ id, character_name, actor_name, school_id, image_url })
+            });
+            closeModal('candidateModal');
+            loadManagementData();
+        }
+
+        async function deleteCandidate(id) {
+            if (!confirm('Delete candidate?')) return;
+            await fetch(`${BACKEND_URL}/api/admin/candidates/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${adminPassword}` }
+            });
+            loadManagementData();
+        }
+
+        function editCandidate(id) {
+            const c = candidatesData.find(x => x.id == id);
+            document.getElementById('candidateId').value = c.id;
+            document.getElementById('candCharacter').value = c.character_name;
+            document.getElementById('candActor').value = c.actor_name;
+            document.getElementById('candSchool').value = c.school_id;
+            document.getElementById('candImage').value = c.image_url || '';
+            document.getElementById('candidateModalTitle').innerText = 'Edit Candidate';
+            openModal('candidateModal');
+        }
+
+        /* ── Settings Logic ── */
+        async function loadSettingsData() {
+            const res = await fetch(`${BACKEND_URL}/api/public/data`);
+            const data = await res.json();
+            if (data.settings) {
+                const formatForSL = (dateStr) => {
+                    if (!dateStr) return '';
+                    const d = new Date(dateStr);
+                    // Convert to Sri Lanka time (UTC + 5:30)
+                    const slDate = new Date(d.getTime() + (5.5 * 60 * 60 * 1000));
+                    return slDate.toISOString().slice(0, 16);
+                };
+
+                if (data.settings.voting_start) document.getElementById('votingStart').value = formatForSL(data.settings.voting_start);
+                if (data.settings.voting_end) document.getElementById('votingEnd').value = formatForSL(data.settings.voting_end);
+            }
+        }
+
+        async function saveSettings() {
+            const start = document.getElementById('votingStart').value; // YYYY-MM-DDTHH:mm
+            const end = document.getElementById('votingEnd').value;
+            if (!start || !end) { alert('Please set both start and end times.'); return; }
+
+            // Append Sri Lankan offset (+05:30)
+            const startISO = `${start}:00+05:30`;
+            const endISO = `${end}:00+05:30`;
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/admin/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+                    body: JSON.stringify({ voting_start: startISO, voting_end: endISO })
+                });
+                if (res.ok) {
+                    const status = document.getElementById('settingsStatus');
+                    status.style.display = 'inline';
+                    setTimeout(() => status.style.display = 'none', 3000);
+                } else {
+                    alert('Failed to save settings.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error connecting to server.');
+            }
+        }
+    </script>
 </body>
+
 </html>

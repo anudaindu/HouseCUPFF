@@ -1,5 +1,5 @@
-const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? window.location.origin 
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? window.location.origin
     : 'https://housecupff.onrender.com';
 
 let schools = [];
@@ -235,14 +235,14 @@ function renderSchools() {
             document.querySelectorAll('#schoolGrid .selectable-card').forEach(el => el.classList.remove('selected'));
             div.classList.add('selected');
             selectedSchool = school.name;
-            
+
             // Reset candidate selection when school changes
             selectedCandidate = null;
             document.getElementById('btnToConfirmation').classList.add('disabled');
-            
+
             // Refresh candidate list for selected school
             renderCandidates();
-            
+
             document.getElementById('btnToVoting').classList.remove('disabled');
         };
         grid.appendChild(div);
@@ -255,7 +255,7 @@ function renderCandidates() {
     grid.innerHTML = '';
 
     // Filter by school if one is selected
-    const filtered = selectedSchool 
+    const filtered = selectedSchool
         ? candidates.filter(c => c.school_name === selectedSchool)
         : candidates;
 
@@ -334,7 +334,7 @@ function setupScrollAnimations() {
 function initCountdown() {
     const countdownEl = document.getElementById('countdown');
     if (!countdownEl) return;
-    
+
     function tick() {
         if (!votingSettings.voting_start || !votingSettings.voting_end) {
             countdownEl.textContent = '---';
@@ -364,7 +364,7 @@ function initCountdown() {
         const h = Math.floor(distance / 3600000);
         const m = Math.floor((distance % 3600000) / 60000);
         const s = Math.floor((distance % 60000) / 1000);
-        
+
         countdownEl.textContent = `${String(h).padStart(2, '0')} : ${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}`;
         setTimeout(tick, 1000);
     }

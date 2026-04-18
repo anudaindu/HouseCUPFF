@@ -78,7 +78,7 @@ app.post('/api/vote', async (req, res) => {
         const settingsRaw = await pool.query('SELECT * FROM settings');
         const settings = {};
         settingsRaw.rows.forEach(s => settings[s.key] = s.value);
-        
+
         const now = new Date();
         const start = new Date(settings.voting_start);
         const end = new Date(settings.voting_end);
@@ -183,7 +183,7 @@ app.get('/api/admin/results', async (req, res) => {
 app.delete('/api/admin/votes/:id', async (req, res) => {
     const auth = req.headers.authorization || `Bearer ${req.query.password}`;
     const token = auth.replace('Bearer ', '');
-    
+
     if (token !== ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'Unauthorized. Wrong admin password.' });
     }
