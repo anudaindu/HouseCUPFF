@@ -71,18 +71,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Progress bar — highlight step when section scrolls into view
     const stepMap = {
-        'ticket-selection': 1, 'seat-selection': 2,
+        'hero': 0, 'ticket-selection': 1, 'seat-selection': 2,
         'school-selection': 3, 'voting': 4, 'confirmation': 5
     };
     // Step Observer (Scroll Reveal)
     const stepObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Removed progress step updates as progress bar was removed
+                const step = stepMap[entry.target.id];
+                if (step > 0) {
+                    updateProgress(step);
+                    document.getElementById('progressBar').classList.add('visible');
+                } else {
+                    document.getElementById('progressBar').classList.remove('visible');
+                }
             }
         });
-    }, { threshold: 0.4 });
-    Object.keys(stepMap).forEach(id => {
+    }, { threshold: 0.5 });
+    
+    ['hero', ...Object.keys(stepMap)].forEach(id => {
         const el = document.getElementById(id);
         if (el) stepObserver.observe(el);
     });
@@ -116,6 +123,7 @@ function validateTicket() {
     errorMsg.classList.add('hidden');
     selectedTicket = val;
     inputEl.value = val;
+    updateProgress(2);
     scrollToSection('seat-selection');
 }
 
@@ -309,12 +317,18 @@ function renderCandidates() {
     });
 }
 
-// Navigation & Scrolling
 function scrollToSection(id) {
+    const stepMap = {
+        'hero': 0, 'ticket-selection': 1, 'seat-selection': 2,
+        'school-selection': 3, 'voting': 4, 'confirmation': 5
+    };
+    if (stepMap[id] !== undefined) updateProgress(stepMap[id]);
+    
     document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
 }
 
 function populateReviewState() {
+    updateProgress(5);
     scrollToSection('confirmation');
     document.getElementById('reviewTicket').textContent = selectedTicket;
     document.getElementById('reviewSeat').textContent = selectedSeat;
@@ -446,10 +460,29 @@ function enterSite() {
         splash.classList.add('fade-out');
         document.body.classList.remove('no-scroll');
         
-        // Slightly delay the entrance of the hero content reveal for drama
         setTimeout(() => {
             const hero = document.getElementById('hero');
             if (hero) hero.classList.add('active');
         }, 300);
+    }
+}
+
+function updateProgress(stepNumber) {
+    const steps = document.querySelectorAll('.pb-step');
+    steps.forEach(step => {
+        const s = parseInt(step.dataset.step);
+        step.classList.remove('active', 'done');
+        if (s < stepNumber) {
+            step.classList.add('done');
+        } else if (s === stepNumber) {
+            step.classList.add('active');
+        }
+    });
+
+    const bar = document.getElementById('progressBar');
+    if (stepNumber > 0) {
+        bar.classList.add('visible');
+    } else {
+        bar.classList.remove('visible');
     }
 }
