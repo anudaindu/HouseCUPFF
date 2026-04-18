@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupScrollAnimations();
     initCountdown();
 
+    // Automatically enter site after cinematic intro (3.5 seconds)
+    setTimeout(enterSite, 3500);
+
     // Debounced seat input — avoids DOM thrash on every keypress
     const seatInput = document.getElementById('seatInput');
     if (seatInput) {
