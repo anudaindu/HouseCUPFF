@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Poster - House Cup Voting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0c;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .poster {
+            background: white;
+            color: #0a0a0c;
+            width: 800px;
+            height: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.4);
+            text-align: center;
+            position: relative;
+        }
+
+        .poster-bg {
+            position: absolute;
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            border: 4px solid #d4af37;
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            color: #0a0a0c;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #0a0a0c;
+            margin-bottom: 3rem;
+        }
+
+        .qr-wrapper {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+        }
+
+        .qr-code {
+            width: 450px;
+            height: 450px;
+            display: block;
+        }
+
+        .footer {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #d4af37;
+            background: #0a0a0c;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .url-text {
+            margin-top: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        @media print {
+            body { background: white; height: auto; display: block; }
+            .poster { width: 100%; height: 100%; box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="poster" id="posterArea">
+        <div class="poster-bg"></div>
+        <h1>Scan to Vote</h1>
+        <div class="subtitle">House Cup Fan Favourite Award</div>
+        
+        <div class="qr-wrapper">
+            <!-- Generating QR dynamically via API without login constraints -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=https://anudaindu.github.io/HouseCUPFF/" class="qr-code" alt="QR Code">
+        </div>
+        
+        <div class="footer">Cast Your Live Vote</div>
+        <div class="url-text">https://anudaindu.github.io/HouseCUPFF/</div>
+    </div>
+</body>
+</html>
