@@ -233,6 +233,14 @@ function renderSchools() {
             document.querySelectorAll('#schoolGrid .selectable-card').forEach(el => el.classList.remove('selected'));
             div.classList.add('selected');
             selectedSchool = school.name;
+            
+            // Reset candidate selection when school changes
+            selectedCandidate = null;
+            document.getElementById('btnToConfirmation').classList.add('disabled');
+            
+            // Refresh candidate list for selected school
+            renderCandidates();
+            
             document.getElementById('btnToVoting').classList.remove('disabled');
         };
         grid.appendChild(div);
@@ -244,7 +252,17 @@ function renderCandidates() {
     if (!grid) return;
     grid.innerHTML = '';
 
-    candidates.forEach(cand => {
+    // Filter by school if one is selected
+    const filtered = selectedSchool 
+        ? candidates.filter(c => c.school_name === selectedSchool)
+        : candidates;
+
+    if (filtered.length === 0 && selectedSchool) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; padding: 3rem; color: var(--muted);">No candidates found for ${selectedSchool}.</div>`;
+        return;
+    }
+
+    filtered.forEach(cand => {
         const initials = cand.actor_name.split(' ').map(n => n[0]).join('');
 
         const div = document.createElement('div');

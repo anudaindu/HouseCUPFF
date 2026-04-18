@@ -140,7 +140,7 @@ app.get('/api/admin/results', async (req, res) => {
         const byCandidate = await pool.query(`SELECT candidate, COUNT(*) AS votes FROM votes GROUP BY candidate ORDER BY votes DESC`);
         const bySchool = await pool.query(`SELECT candidate, school, COUNT(*) AS votes FROM votes GROUP BY candidate, school ORDER BY candidate, votes DESC`);
         const total = await pool.query(`SELECT COUNT(*) AS total FROM votes`);
-        const allVotes = await pool.query(`SELECT ticket, seat, school, candidate, voted_at FROM votes ORDER BY voted_at DESC`);
+        const allVotes = await pool.query(`SELECT id, ticket, seat, school, candidate, voted_at FROM votes ORDER BY voted_at DESC`);
 
         return res.json({
             totalVotes: parseInt(total.rows[0].total),
@@ -151,6 +151,24 @@ app.get('/api/admin/results', async (req, res) => {
     } catch (err) {
         console.error('[RESULTS ERROR]', err);
         return res.status(500).json({ error: 'Failed to retrieve results.' });
+    }
+});
+
+// ── DELETE /api/admin/votes/:id ─────────────────────────────────────────────
+app.delete('/api/admin/votes/:id', async (req, res) => {
+    const auth = req.headers.authorization || `Bearer ${req.query.password}`;
+    const token = auth.replace('Bearer ', '');
+    
+    if (token !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: 'Unauthorized. Wrong admin password.' });
+    }
+
+    try {
+        await pool.query('DELETE FROM votes WHERE id = $1', [req.params.id]);
+        res.json({ success: true, message: 'Vote deleted successfully.' });
+    } catch (err) {
+        console.error('[DELETE VOTE ERROR]', err);
+        res.status(500).json({ error: 'Failed to delete vote.' });
     }
 });
 

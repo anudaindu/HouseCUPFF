@@ -275,10 +275,11 @@
                             <th>Seat</th>
                             <th>School</th>
                             <th>Candidate</th>
+                            <th style="text-align:right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="auditBody">
-                        <tr><td colspan="4" class="empty-state">Loading…</td></tr>
+                        <tr><td colspan="5" class="empty-state">Loading…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -509,13 +510,33 @@
 
     function renderAuditTable(allVotes) {
         const tbody = document.getElementById('auditBody');
-        if (!allVotes.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No votes.</td></tr>'; return; }
+        if (!allVotes.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No votes.</td></tr>'; return; }
         tbody.innerHTML = allVotes.map(v => `<tr>
             <td style="color:var(--muted)">${v.ticket}</td>
             <td><span style="color:var(--gold)">${v.seat}</span></td>
             <td>${v.school}</td>
             <td>${v.candidate.split('(')[0].trim()}</td>
+            <td class="td-actions">
+                <button class="btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteVote(${v.id})">Clear Vote</button>
+            </td>
         </tr>`).join('');
+    }
+
+    async function deleteVote(id) {
+        if (!confirm('Permanently delete this vote record?')) return;
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/admin/votes/${id}?password=${encodeURIComponent(adminPassword)}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                loadResults(); // Refresh everything
+            } else {
+                alert('Failed to delete vote.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error connecting to server.');
+        }
     }
 
     /* ── Management Logic ── */
