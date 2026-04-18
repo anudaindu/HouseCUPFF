@@ -224,6 +224,7 @@
             <div class="nav-tab active" onclick="switchTab('results', this)">📊 Results</div>
             <div class="nav-tab" onclick="switchTab('candidates', this)">🎭 Candidates</div>
             <div class="nav-tab" onclick="switchTab('schools', this)">🏫 Schools</div>
+            <div class="nav-tab" onclick="switchTab('settings', this)">⚙ Settings</div>
         </div>
         <div class="meta">
             <div class="dot"></div>
@@ -314,11 +315,6 @@
         <!-- ======================= -->
         <!-- TAB: SCHOOLS            -->
         <!-- ======================= -->
-        <div id="tab-schools" class="tab-content">
-            <h2 class="section-title">
-                Manage Schools
-                <button class="btn-primary" style="font-size: .8rem; padding: .5rem 1rem;" onclick="openModal('schoolModal')">+ Add School</button>
-            </h2>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -332,6 +328,31 @@
                         <tr><td colspan="2" class="empty-state">No schools loaded yet.</td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- TAB: SETTINGS           -->
+        <!-- ======================= -->
+        <div id="tab-settings" class="tab-content">
+            <h2 class="section-title">Voting Window Configuration</h2>
+            <div class="chart-card" style="max-width: 600px;">
+                <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Define when the voting platform is open for submissions. 
+                    <br><strong>Timezone: Sri Lanka (GMT+5:30)</strong>
+                </p>
+                <div class="form-group">
+                    <label>Voting Start Time</label>
+                    <input type="datetime-local" id="votingStart">
+                </div>
+                <div class="form-group">
+                    <label>Voting End Time</label>
+                    <input type="datetime-local" id="votingEnd">
+                </div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="btn-primary" onclick="saveSettings()">Save Window Configuration</button>
+                    <span id="settingsStatus" style="color: var(--success); font-size: 0.9rem; align-self: center; display: none;">✓ Saved</span>
+                </div>
             </div>
         </div>
     </div>
@@ -406,6 +427,7 @@
         el.classList.add('active');
         document.getElementById(`tab-${tabId}`).classList.add('active');
         if(tabId === 'candidates' || tabId === 'schools') loadManagementData();
+        if(tabId === 'settings') loadSettingsData();
     }
 
     /* ── Modals ── */
@@ -647,6 +669,52 @@
         document.getElementById('candImage').value = c.image_url || '';
         document.getElementById('candidateModalTitle').innerText = 'Edit Candidate';
         openModal('candidateModal');
+    }
+
+    /* ── Settings Logic ── */
+    async function loadSettingsData() {
+        const res = await fetch(`${BACKEND_URL}/api/public/data`);
+        const data = await res.json();
+        if (data.settings) {
+            const formatForSL = (dateStr) => {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
+                // Convert to Sri Lanka time (UTC + 5:30)
+                const slDate = new Date(d.getTime() + (5.5 * 60 * 60 * 1000));
+                return slDate.toISOString().slice(0, 16);
+            };
+
+            if (data.settings.voting_start) document.getElementById('votingStart').value = formatForSL(data.settings.voting_start);
+            if (data.settings.voting_end)   document.getElementById('votingEnd').value = formatForSL(data.settings.voting_end);
+        }
+    }
+
+    async function saveSettings() {
+        const start = document.getElementById('votingStart').value; // YYYY-MM-DDTHH:mm
+        const end = document.getElementById('votingEnd').value;
+        if (!start || !end) { alert('Please set both start and end times.'); return; }
+
+        // Append Sri Lankan offset (+05:30)
+        const startISO = `${start}:00+05:30`;
+        const endISO = `${end}:00+05:30`;
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/admin/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+                body: JSON.stringify({ voting_start: startISO, voting_end: endISO })
+            });
+            if (res.ok) {
+                const status = document.getElementById('settingsStatus');
+                status.style.display = 'inline';
+                setTimeout(() => status.style.display = 'none', 3000);
+            } else {
+                alert('Failed to save settings.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error connecting to server.');
+        }
     }
 </script>
 </body>

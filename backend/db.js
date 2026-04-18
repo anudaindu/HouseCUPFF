@@ -35,6 +35,15 @@ async function initDB() {
                 candidate   VARCHAR(150) NOT NULL,
                 voted_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
             );
+
+            CREATE TABLE IF NOT EXISTS settings (
+                key     VARCHAR(50) PRIMARY KEY,
+                value   TEXT NOT NULL
+            );
+
+            -- Seed default settings if they don't exist
+            INSERT INTO settings (key, value) VALUES ('voting_start', NOW()) ON CONFLICT (key) DO NOTHING;
+            INSERT INTO settings (key, value) VALUES ('voting_end', NOW() + INTERVAL '2 hours') ON CONFLICT (key) DO NOTHING;
         `);
         console.log('[DB] votes table ready.');
     } finally {

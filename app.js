@@ -4,6 +4,7 @@ const BACKEND_URL = window.location.hostname === 'localhost' || window.location.
 
 let schools = [];
 let candidates = [];
+let votingSettings = { voting_start: null, voting_end: null };
 
 let selectedTicket = null;
 let selectedSeat = null;
@@ -87,6 +88,7 @@ async function fetchData() {
         const data = await res.json();
         schools = data.schools;
         candidates = data.candidates;
+        votingSettings = data.settings || {};
     } catch (err) {
         console.error('Failed to fetch data:', err);
     }
@@ -332,23 +334,38 @@ function setupScrollAnimations() {
 function initCountdown() {
     const countdownEl = document.getElementById('countdown');
     if (!countdownEl) return;
-    const target = Date.now() + (2 * 60 * 60 * 1000);
-    let lastDisplay = '';
-
+    
     function tick() {
-        const distance = target - Date.now();
-        if (distance < 0) {
-            countdownEl.textContent = 'CLOSED';
+        if (!votingSettings.voting_start || !votingSettings.voting_end) {
+            countdownEl.textContent = '---';
+            setTimeout(tick, 2000);
             return;
         }
+
+        const now = Date.now();
+        const start = new Date(votingSettings.voting_start).getTime();
+        const end = new Date(votingSettings.voting_end).getTime();
+
+        if (now < start) {
+            countdownEl.textContent = 'SOON';
+            setTimeout(tick, 1000);
+            return;
+        }
+
+        const distance = end - now;
+        if (distance < 0) {
+            countdownEl.textContent = 'CLOSED';
+            // Disable voting buttons if expired
+            const submitBtn = document.getElementById('submitVoteBtn');
+            if (submitBtn) submitBtn.disabled = true;
+            return;
+        }
+
         const h = Math.floor(distance / 3600000);
         const m = Math.floor((distance % 3600000) / 60000);
         const s = Math.floor((distance % 60000) / 1000);
-        const display = `${String(h).padStart(2, '0')} : ${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}`;
-        if (display !== lastDisplay) {
-            countdownEl.textContent = display;
-            lastDisplay = display;
-        }
+        
+        countdownEl.textContent = `${String(h).padStart(2, '0')} : ${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}`;
         setTimeout(tick, 1000);
     }
     tick();

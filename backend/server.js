@@ -55,9 +55,14 @@ app.get('/api/public/data', async (req, res) => {
             JOIN schools s ON c.school_id = s.id 
             ORDER BY c.character_name ASC
         `);
+        const settingsRaw = await pool.query('SELECT * FROM settings');
+        const settings = {};
+        settingsRaw.rows.forEach(s => settings[s.key] = s.value);
+
         res.json({
             schools: schools.rows,
-            candidates: candidates.rows
+            candidates: candidates.rows,
+            settings: settings
         });
     } catch (err) {
         console.error('[DATA FETCH ERROR]', err);
@@ -68,6 +73,26 @@ app.get('/api/public/data', async (req, res) => {
 // ── POST /api/vote ──────────────────────────────────────────────────────────
 // Body: { ticket: "T123", seat: "A3", school: "...", candidate: "Romeo (Renal Perera)" }
 app.post('/api/vote', async (req, res) => {
+    // Check if voting window is open
+    try {
+        const settingsRaw = await pool.query('SELECT * FROM settings');
+        const settings = {};
+        settingsRaw.rows.forEach(s => settings[s.key] = s.value);
+        
+        const now = new Date();
+        const start = new Date(settings.voting_start);
+        const end = new Date(settings.voting_end);
+
+        if (now < start) {
+            return res.status(403).json({ error: 'Voting has not started yet.' });
+        }
+        if (now > end) {
+            return res.status(403).json({ error: 'Voting is now closed.' });
+        }
+    } catch (err) {
+        console.error('[WINDOW CHECK ERROR]', err);
+    }
+
     const { ticket, seat, school, candidate } = req.body;
 
     // 1. Input presence check
@@ -228,6 +253,20 @@ app.delete('/api/admin/candidates/:id', async (req, res) => {
         await pool.query('DELETE FROM candidates WHERE id = $1', [req.params.id]);
         res.json({ success: true });
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update Voting Window
+app.post('/api/admin/settings', async (req, res) => {
+    if (req.headers.authorization !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).send('Unauthorized');
+    const { voting_start, voting_end } = req.body;
+    try {
+        if (voting_start) await pool.query('UPDATE settings SET value = $1 WHERE key = \'voting_start\'', [voting_start]);
+        if (voting_end) await pool.query('UPDATE settings SET value = $1 WHERE key = \'voting_end\'', [voting_end]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('[SETTINGS UPDATE ERROR]', err);
         res.status(500).json({ error: err.message });
     }
 });
