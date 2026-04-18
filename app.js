@@ -36,6 +36,9 @@ const layout = [
 const takenSeats = ['A5', 'A6', 'D12', 'D13', 'F8', 'G2', 'K19', 'O14', 'O15', 'P1', 'P25', 'Q10'];
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Disable scroll for splash screen
+    document.body.classList.add('no-scroll');
+
     await fetchData();
     initSeatGrid();
     renderSchools();
@@ -431,5 +434,19 @@ async function submitVote() {
             errorEl.textContent = 'Could not reach the server. Check your connection.';
             errorEl.classList.remove('hidden');
         }
+    }
+}
+// Splash Screen Transition
+function enterSite() {
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        splash.classList.add('fade-out');
+        document.body.classList.remove('no-scroll');
+        
+        // Slightly delay the entrance of the hero content reveal for drama
+        setTimeout(() => {
+            const hero = document.getElementById('hero');
+            if (hero) hero.classList.add('active');
+        }, 300);
     }
 }
